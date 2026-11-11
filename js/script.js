@@ -65,6 +65,16 @@ document.addEventListener("DOMContentLoaded", () => {
             role: "Organização dos repositórios, definição de pipelines e estrutura de integração com a esteira corporativa.",
             technologies: ["Azure DevOps", "Git", "YAML", "CI/CD", "Linux", "Shell Script"],
             result: "Maior padronização e automação dos processos de desenvolvimento e entrega."
+        },
+        {
+            id: "data-warehouse",
+            category: "DATA ENGINEERING",
+            title: "Data Warehouse para Análise de Negócios",
+            description: "Projeto de modelagem dimensional e construção de um Data Warehouse para consolidar informações gerenciais e apoiar análises de negócio.",
+            challenge: "Organizar dados de diferentes fontes em uma estrutura confiável, consistente e adequada para consultas analíticas.",
+            role: "Modelagem dimensional, definição de processos ETL e desenvolvimento de consultas analíticas em SQL.",
+            technologies: ["SQL", "ETL", "Data Warehousing", "Modelagem Dimensional", "SQL Server", "Power BI"],
+            result: "Informações gerenciais consolidadas em uma estrutura preparada para análises e tomada de decisão."
         }
     ];
 
@@ -231,6 +241,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
         let lastFocused = null;
         const focusableSelector = 'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])';
+        const hashProjectMap = {
+            "projeto-databricks": "databricks",
+            "data-warehouse": "data-warehouse",
+            "projeto-devops": "devops"
+        };
+
+        function clearProjectHash() {
+            const cleanUrl = `${window.location.pathname}${window.location.search}`;
+            window.history.replaceState(null, document.title, cleanUrl);
+        }
 
         function openModal(projectId) {
             const project = findProjectById(projectId);
@@ -270,6 +290,7 @@ document.addEventListener("DOMContentLoaded", () => {
             projectModalEl.setAttribute('aria-hidden', 'true');
             document.body.classList.remove('modal-open');
             document.querySelector('main').setAttribute('aria-hidden', 'false');
+            clearProjectHash();
 
             // restore scroll
             const scrollY = document.body.style.top ? -parseInt(document.body.style.top || '0', 10) : 0;
@@ -317,6 +338,14 @@ document.addEventListener("DOMContentLoaded", () => {
         modalCloseEl && modalCloseEl.addEventListener('click', closeModal);
         modalOverlayEl && modalOverlayEl.addEventListener('click', closeModal);
         document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && projectModalEl.classList.contains('active')) closeModal(); });
+
+        function openModalFromHash() {
+            const projectId = hashProjectMap[window.location.hash.slice(1)];
+            if (projectId) openModal(projectId);
+        }
+
+        window.addEventListener('hashchange', openModalFromHash);
+        openModalFromHash();
     }
 
     /* ---------------- Project cards interaction ------------- */
