@@ -42,19 +42,19 @@ Busco oportunidades como **Engenheiro de Dados Júnior** para aprofundar meus co
 
 Pipeline de ingestão, transformação e disponibilização de dados utilizando Databricks, Apache Spark e Delta Lake, com aplicação da arquitetura Medalhão (Bronze, Silver e Gold).
 
-[![Ver projeto](https://img.shields.io/badge/Ver%20projeto-Visitar%20portf%C3%B3lio-2563EB?style=for-the-badge)](https://pedrohenriquerc.github.io/PedroHenriqueRC/)
+[![Ver Projeto](https://img.shields.io/badge/Ver%20Projeto-%E2%86%92-2563EB?style=for-the-badge)](https://pedrohenriquerc.github.io/PedroHenriqueRC/#projeto-databricks)
 
 ### Data Warehouse para Análise de Negócios
 
 Modelagem dimensional e construção de Data Warehouse para consolidação de informações gerenciais, incluindo processos ETL e consultas analíticas em SQL.
 
-[![Ver projeto](https://img.shields.io/badge/Ver%20projeto-Visitar%20portf%C3%B3lio-2563EB?style=for-the-badge)](https://pedrohenriquerc.github.io/PedroHenriqueRC/)
+[![Ver Projeto](https://img.shields.io/badge/Ver%20Projeto-%E2%86%92-2563EB?style=for-the-badge)](https://pedrohenriquerc.github.io/PedroHenriqueRC/#data-warehouse)
 
 ### Projetos Acadêmicos de Computação em Nuvem e DevOps
 
 Implementação de aplicações e serviços utilizando AWS, Docker e práticas de CI/CD em atividades acadêmicas, explorando automação e integração contínua.
 
-[![Ver projeto](https://img.shields.io/badge/Ver%20projeto-Visitar%20portf%C3%B3lio-2563EB?style=for-the-badge)](https://pedrohenriquerc.github.io/PedroHenriqueRC/)
+[![Ver Projeto](https://img.shields.io/badge/Ver%20Projeto-%E2%86%92-2563EB?style=for-the-badge)](https://pedrohenriquerc.github.io/PedroHenriqueRC/#projeto-devops)
 
 ## Estatísticas do GitHub
 

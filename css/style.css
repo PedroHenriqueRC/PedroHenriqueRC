@@ -314,6 +314,11 @@ div {
         transform var(--transition);
 }
 
+.project-card,
+#data-warehouse {
+    scroll-margin-top: 96px;
+}
+
 #navbar.scrolled {
     background: rgba(5, 7, 11, 0.78);
 
