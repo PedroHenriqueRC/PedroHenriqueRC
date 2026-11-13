@@ -1,19 +1,24 @@
-<div align="start
-">
+<div align="center">
 
 # Olá, eu sou Pedro Henrique Rodrigues Cardoso.
 
-### Engenheiro de Dados Júnior | Python | SQL | Databricks | Azure
+### Estagiário de Engenharia de Dados | Python | SQL | Databricks | Azure
 
-Construo pipelines de dados, processos ETL e soluções analíticas escaláveis.
+Engenharia de Dados | Python | SQL | Databricks | Apache Spark
 
 </div>
 
 ## Sobre mim
 
-Sou estudante de Bacharelado em Sistemas de Informação pela São Paulo Tech School (SPTech) e atuo como estagiário de Engenharia de Dados. Tenho experiência com desenvolvimento de pipelines de dados, processos ETL, modelagem de dados e plataformas de dados em nuvem utilizando Databricks, Azure e Python.
+Sou estudante de Bacharelado em Sistemas de Informação pela São Paulo Tech School (SPTech), com formação técnica em Desenvolvimento de Sistemas pela ETEC Jorge Street. Desde fevereiro de 2025, atuo como estagiário de Engenharia de Dados na Vivo (Telefônica Brasil), trabalhando com sustentação e evolução de pipelines, processos ETL/ELT, modernização de soluções analíticas, análise de impactos, validação de dados e documentação técnica.
 
-Busco oportunidades como **Engenheiro de Dados Júnior** para aprofundar meus conhecimentos, contribuir com soluções escaláveis e gerar valor por meio de dados.
+Trabalho com Python, SQL, Databricks, Apache Spark, Hadoop, Hive/HQL, Git e Azure DevOps. Busco minha próxima oportunidade como **Engenheiro de Dados Júnior**, contribuindo para pipelines confiáveis, automação, qualidade e governança de dados.
+
+## Formação e experiência
+
+- **Sistemas de Informação — São Paulo Tech School (SPTech):** graduação em andamento, com formação prática em desenvolvimento de software, engenharia e modelagem de dados, cloud, Big Data, arquitetura de sistemas e metodologias ágeis.
+- **Desenvolvimento de Sistemas — ETEC Jorge Street (P-TECH):** formação técnica concluída, com estudos em Java, desenvolvimento web, bancos de dados, desenvolvimento mobile e análise de sistemas.
+- **Vivo (Telefônica Brasil):** estagiário de Engenharia de Dados desde fevereiro de 2025, com atuação em pipelines, processos ETL/ELT, Databricks, qualidade de dados e documentação para auditoria.
 
 ## Tecnologias e ferramentas
 
@@ -38,23 +43,33 @@ Busco oportunidades como **Engenheiro de Dados Júnior** para aprofundar meus co
 
 ## Projetos em destaque
 
-### Pipeline de Engenharia de Dados com Databricks e Azure
+### Migração de workflows Alteryx para Databricks
 
-Pipeline de ingestão, transformação e disponibilização de dados utilizando Databricks, Apache Spark e Delta Lake, com aplicação da arquitetura Medalhão (Bronze, Silver e Gold).
+Iniciativa de modernização de fluxos analíticos, com mapeamento de workflows, adequação de regras de negócio, validações automatizadas, Data Quality, observabilidade e documentação técnica. Participei da migração de **43 workflows**, dentro de um total de 635 migrados pelo time.
 
 [![Ver Projeto](https://img.shields.io/badge/Ver%20Projeto-%E2%86%92-2563EB?style=for-the-badge)](https://pedrohenriquerc.github.io/PedroHenriqueRC/#projeto-databricks)
 
-### Data Warehouse para Análise de Negócios
+### Adequação ao CNPJ alfanumérico
 
-Modelagem dimensional e construção de Data Warehouse para consolidação de informações gerenciais, incluindo processos ETL e consultas analíticas em SQL.
+Análise de arquivos XML com apoio de IA generativa, ajustes em Shell Script, análise de impactos e suporte à homologação para preparar sistemas, pipelines e integrações para o novo padrão. Contribuí para a adequação de aproximadamente **200 arquivos e fluxos**.
 
 [![Ver Projeto](https://img.shields.io/badge/Ver%20Projeto-%E2%86%92-2563EB?style=for-the-badge)](https://pedrohenriquerc.github.io/PedroHenriqueRC/#data-warehouse)
 
-### Projetos Acadêmicos de Computação em Nuvem e DevOps
+### Esteira DevOps e projeto acadêmico
 
-Implementação de aplicações e serviços utilizando AWS, Docker e práticas de CI/CD em atividades acadêmicas, explorando automação e integração contínua.
+Experiências com organização de repositórios, Azure DevOps, Git, YAML, Linux, SSH e CI/CD. Na formação acadêmica, participei dos projetos **PAM — Project Allocation Manager**, **FreezeWay** e **Preciosos Laços**, atuando em dados, integrações, desenvolvimento e documentação.
 
 [![Ver Projeto](https://img.shields.io/badge/Ver%20Projeto-%E2%86%92-2563EB?style=for-the-badge)](https://pedrohenriquerc.github.io/PedroHenriqueRC/#projeto-devops)
+
+## Objetivo profissional
+
+Atuar como Engenheiro de Dados Júnior em projetos que envolvam pipelines, plataformas de dados, automação e governança, ampliando minha capacidade de transformar requisitos de negócio em soluções confiáveis e escaláveis.
+
+## Certificações e idiomas
+
+- Yellow Belt Lean Six Sigma — Vivo (Telefônica Brasil)
+- Get Started with Databricks for Data Engineering — Databricks
+- Inglês intermediário | Espanhol básico
 
 ## Estatísticas do GitHub
 
@@ -74,6 +89,9 @@ Implementação de aplicações e serviços utilizando AWS, Docker e práticas d
 	</a>
 	<a href="mailto:pedro.hrocs@gmail.com">
 		<img src="https://img.shields.io/badge/E--mail-D14836?style=for-the-badge&logo=gmail&logoColor=white" alt="E-mail" />
+	</a>
+	<a href="https://pedrohenriquerc.github.io/PedroHenriqueRC/assets/arquivo/CurriculoPedroHenrique%201.pdf" target="_blank" rel="noopener noreferrer">
+		<img src="https://img.shields.io/badge/Curr%C3%ADculo-555555?style=for-the-badge&logo=readthedocs&logoColor=white" alt="Currículo" />
 	</a>
 	<a href="https://pedrohenriquerc.github.io/PedroHenriqueRC/" target="_blank">
 		<img src="https://img.shields.io/badge/Portf%C3%B3lio-2563EB?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Portfólio" />
