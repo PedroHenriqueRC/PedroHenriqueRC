@@ -1,0 +1,63 @@
+Minha trajetória na tecnologia
+Minha jornada na tecnologia começou durante o curso Técnico em Desenvolvimento de Sistemas pela ETEC Jorge Street (P-TECH), onde tive os primeiros contatos com programação, desenvolvimento web, bancos de dados e desenvolvimento de aplicações.
+
+Atualmente curso Bacharelado em Sistemas de Informação na São Paulo Tech School (SPTech), uma graduação com metodologia baseada em projetos reais, desafios de negócio e desenvolvimento ágil. Desde o primeiro semestre, os estudantes trabalham em equipes multidisciplinares utilizando Scrum, realizando entregas incrementais por meio de sprints e apresentando MVPs para validação contínua dos projetos.
+
+Primeiro ano - Fundamentos de tecnologia e Internet das Coisas (IoT)
+Durante o primeiro ano desenvolvi minha base em lógica de programação, algoritmos, banco de dados, desenvolvimento web e metodologias ágeis.
+
+Tecnologias trabalhadas:
+
+Java
+JavaScript
+HTML
+CSS
+MySQL
+Arduino
+Linux
+Scrum
+O principal projeto desse período foi o desenvolvimento do FreezeWay, uma solução para monitoramento de temperatura em baús frigoríficos utilizados no transporte de cargas perecíveis.
+
+A solução utilizava sensores LM35 conectados a um Arduino para captura das temperaturas em tempo real, enviando as informações para um sistema responsável por exibir alertas e acompanhar possíveis desvios operacionais, contribuindo para a preservação da qualidade da carga e para ações preventivas de manutenção.
+
+Segundo ano - Desenvolvimento Full Stack e cliente real
+Durante o segundo ano passei a atuar simultaneamente em projetos acadêmicos e em minha experiência profissional na Vivo, ampliando minha visão sobre desenvolvimento de software e soluções corporativas.
+
+Tecnologias trabalhadas:
+
+React
+JavaScript
+Node.js
+Kotlin
+Spring Boot
+MySQL
+AWS
+Power BI
+APIs REST
+Scrum
+Nesse período participei do desenvolvimento do projeto Preciosos Laços, realizado para uma cliente real.
+
+O objetivo era apoiar a digitalização da operação de uma empreendedora que comercializava laços artesanais. Desenvolvemos uma plataforma de e-commerce para divulgação e gerenciamento dos produtos, além de dashboards analíticos que permitiam acompanhar indicadores de vendas, clientes recorrentes e desempenho dos produtos comercializados.
+
+Essa experiência proporcionou contato direto com levantamento de requisitos, validação com stakeholders, desenvolvimento Full Stack, banco de dados e entrega contínua de valor ao cliente.
+
+Terceiro ano - Engenharia de Dados e transformação digital
+Atualmente atuo como Estagiário de Engenharia de Dados na Vivo (Telefônica Brasil) e aplico diariamente conceitos de dados em ambiente corporativo.
+
+Tecnologias trabalhadas:
+
+Python
+SQL
+Databricks
+Apache Spark
+Hadoop
+Hive/HQL
+Git
+Azure DevOps
+Linux
+ETL/ELT
+No projeto acadêmico atual, participo do desenvolvimento do PAM (Project Allocation Manager), uma solução voltada ao gerenciamento da alocação de recursos, projetos, entregas e apontamento de horas em equipes de tecnologia.
+
+O projeto nasceu da identificação de processos manuais realizados por meio de planilhas, buscando aumentar a autonomia dos colaboradores, melhorar a visibilidade gerencial e reduzir atividades operacionais repetitivas.
+
+Combinando experiência acadêmica e profissional, venho direcionando minha formação para Engenharia de Dados, Analytics e plataformas modernas de dados, buscando desenvolver soluções escaláveis, confiáveis e orientadas ao negócio.
