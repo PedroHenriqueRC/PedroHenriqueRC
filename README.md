@@ -2,9 +2,7 @@
 
 # Olá, eu sou Pedro Henrique Rodrigues Cardoso.
 
-### Estagiário de Engenharia de Dados | Python | SQL | Databricks | Azure
-
-Engenharia de Dados | Python | SQL | Databricks | Apache Spark
+### Estagiário de Engenharia de Dados | Python | SQL | Databricks | Azure | Apache Spark
 
 </div>
 
@@ -16,9 +14,12 @@ Trabalho com Python, SQL, Databricks, Apache Spark, Hadoop, Hive/HQL, Git e Azur
 
 ## Formação e experiência
 
-- **Sistemas de Informação — São Paulo Tech School (SPTech):** graduação em andamento, com formação prática em desenvolvimento de software, engenharia e modelagem de dados, cloud, Big Data, arquitetura de sistemas e metodologias ágeis.
-- **Desenvolvimento de Sistemas — ETEC Jorge Street (P-TECH):** formação técnica concluída, com estudos em Java, desenvolvimento web, bancos de dados, desenvolvimento mobile e análise de sistemas.
-- **Vivo (Telefônica Brasil):** estagiário de Engenharia de Dados desde fevereiro de 2025, com atuação em pipelines, processos ETL/ELT, Databricks, qualidade de dados e documentação para auditoria.
+- **Sistemas de Informação — São Paulo Tech School (SPTech):** 
+	> Graduação em andamento, com formação prática em desenvolvimento de software, engenharia e modelagem de dados, cloud, Big Data, arquitetura de sistemas e metodologias ágeis.
+- **Desenvolvimento de Sistemas — ETEC Jorge Street (P-TECH):** 
+	> Formação técnica concluída, com estudos em Java, desenvolvimento web, bancos de dados, desenvolvimento mobile e análise de sistemas.
+- **Vivo (Telefônica Brasil):** 
+	> Estagiário de Engenharia de Dados desde fevereiro de 2025, com atuação em pipelines, processos ETL/ELT, Databricks, qualidade de dados e documentação para auditoria.
 
 ## Tecnologias e ferramentas
 
@@ -45,31 +46,60 @@ Trabalho com Python, SQL, Databricks, Apache Spark, Hadoop, Hive/HQL, Git e Azur
 
 ### Migração de workflows Alteryx para Databricks
 
-Iniciativa de modernização de fluxos analíticos, com mapeamento de workflows, adequação de regras de negócio, validações automatizadas, Data Quality, observabilidade e documentação técnica. Participei da migração de **43 workflows**, dentro de um total de 635 migrados pelo time.
+**Contexto**: Modernização de workflows analíticos, com foco em eficiência operacional, governança de dados e redução de custos de licenciamento. 
+**Atuação**: Mapeamento e análise de workflows existentes; conversão de processos para Databricks; adequação de regras de negócio; implementação de validações automatizadas; apoio a iniciativas de Data Quality, observabilidade e documentação técnica. 
+**Tecnologias**: Databricks, Apache Spark, Python e Alteryx. 
+**Resultado**: Participação na migração de 43 workflows, dentro de um total de 635 migrados pelo time de desenvolvimento, contribuindo para a modernização da plataforma analítica e o fortalecimento da governança de dados. 
 
 [![Ver Projeto](https://img.shields.io/badge/Ver%20Projeto-%E2%86%92-2563EB?style=for-the-badge)](https://pedrohenriquerc.github.io/PedroHenriqueRC/#projeto-databricks)
 
 ### Adequação ao CNPJ alfanumérico
 
-Análise de arquivos XML com apoio de IA generativa, ajustes em Shell Script, análise de impactos e suporte à homologação para preparar sistemas, pipelines e integrações para o novo padrão. Contribuí para a adequação de aproximadamente **200 arquivos e fluxos**.
+**Contexto**: Preparação de sistemas, pipelines e integrações para suportar o novo padrão de identificação do CNPJ. 
+**Atuação**: Análise de arquivos XML com apoio de IA generativa; ajustes em processos utilizando Shell Script; análise de impactos em fluxos de dados; elaboração de documentação técnica e suporte às etapas de homologação. 
+**Tecnologias**: Shell Script, Apache Spark, XML e IA Generativa. 
+**Resultado**: Contribuição para a adequação de aproximadamente 200 arquivos e fluxos, dentro de um universo de 900 tratados pelo time de desenvolvimento, apoiando a continuidade operacional e reduzindo riscos de inconsistências nos dados. 
 
 [![Ver Projeto](https://img.shields.io/badge/Ver%20Projeto-%E2%86%92-2563EB?style=for-the-badge)](https://pedrohenriquerc.github.io/PedroHenriqueRC/#data-warehouse)
 
-### Esteira DevOps e projeto acadêmico
+### Adequação à Esteira Corporativa de DevOps 
 
-Experiências com organização de repositórios, Azure DevOps, Git, YAML, Linux, SSH e CI/CD. Na formação acadêmica, participei dos projetos **PAM — Project Allocation Manager**, **FreezeWay** e **Preciosos Laços**, atuando em dados, integrações, desenvolvimento e documentação.
+**Contexto**: Adequação de projetos legados aos padrões corporativos de desenvolvimento, versionamento e controle de mudanças. 
+**Atuação**: Análise da arquitetura existente; participação na migração para Azure DevOps; estruturação de repositórios; configuração de pipelines CI/CD; configuração de regras de implantação e versionamento; documentação técnica e padronização do fluxo de alterações. 
+**Tecnologias**: Azure DevOps, Git, YAML, Linux e SSH. 
+**Resultado**: Maior rastreabilidade das alterações, padronização do processo de implantação e redução de intervenções manuais em produção.
 
 [![Ver Projeto](https://img.shields.io/badge/Ver%20Projeto-%E2%86%92-2563EB?style=for-the-badge)](https://pedrohenriquerc.github.io/PedroHenriqueRC/#projeto-devops)
 
+### Projetos acadêmicos
+
+##### <ins style="color: darkblue;">PAM | Project Allocation Manager</ins>
+Desenvolvimento de uma solução para gerenciamento de alocação de recursos, projetos, fases, entregas e lançamento de horas. Atuação na modelagem do banco de dados e na implementação de processos de integração e armazenamento de dados, utilizando automação de fluxos, armazenamento em nuvem e dashboards para acompanhamento das informações. 
+
+**Tecnologias**: MySQL, SQL, n8n, AWS S3, Amazon EC2, Grafana, React, JavaScript e NodeJS. 
+
+
+##### <ins style="color: darkblue;">FreezeWay | Sistema de Monitoramento de Temperatura </ins>
+Desenvolvimento de uma solução de monitoramento de temperatura utilizando Arduino, com integração a banco de dados MySQL e serviços executados em máquina virtual Linux Ubuntu. Participação na integração entre hardware e software, coleta, processamento e armazenamento das informações monitoradas. 
+
+**Tecnologias**: Arduino Uno, MySQL, Linux Ubuntu, Máquina Virtual, HTML5, CSS, JavaScript e NodeJS. 
+
+##### <ins style="color: darkblue;">Preciosos Laços | Desenvolvimento de Solução para Cliente Real </ins>
+
+Participação no desenvolvimento de uma solução para cliente real, utilizando metodologia ágil e acompanhando etapas do ciclo de desenvolvimento. Atuação no levantamento de requisitos, definição da arquitetura, desenvolvimento Front-End e Back-End, modelagem e implementação do banco de dados, documentação técnica e apresentações/validações com stakeholders. 
+
+**Tecnologias**: Kotlin, Spring Boot, MySQL, JWT, React, JavaScript e NodeJS. 
+
+
 ## Objetivo profissional
 
-Atuar como Engenheiro de Dados Júnior em projetos que envolvam pipelines, plataformas de dados, automação e governança, ampliando minha capacidade de transformar requisitos de negócio em soluções confiáveis e escaláveis.
+Atuar como **Engenheiro de Dados Júnior** em projetos que envolvam pipelines, plataformas de dados, automação e governança, ampliando minha capacidade de transformar requisitos de negócio em soluções confiáveis e escaláveis.
 
-## Certificações e idiomas
+## Certificações, treinamentos e idiomas
 
-- Yellow Belt Lean Six Sigma — Vivo (Telefônica Brasil)
-- Get Started with Databricks for Data Engineering — Databricks
-- Inglês intermediário | Espanhol básico
+- **Yellow Belt Lean Six Sigma** — Vivo (Telefônica Brasil)
+- **Get Started with Databricks for Data Engineering** — Databricks
+- **Inglês** intermediário | **Espanhol** básico
 
 ## Estatísticas do GitHub
 
