@@ -18,6 +18,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const navLinks = document.querySelectorAll(".nav-link");
 
     const cursorGlowEl = document.querySelector(".cursor-glow");
+    const readingProgressBarEl = document.getElementById("reading-progress-bar");
+    const backToTopEl = document.getElementById("back-to-top");
 
     const projectModalEl = document.getElementById("project-modal");
     const modalOverlayEl = document.getElementById("modal-overlay");
@@ -31,7 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const modalTechnologiesEl = document.getElementById("modal-technologies");
     const modalResultEl = document.getElementById("modal-result");
 
-    let projectCards = document.querySelectorAll(".project-card");
+    let projectCards = document.querySelectorAll(".projects-section .project-card");
     const sections = document.querySelectorAll("main section[id]");
 
     // Project data centralizada como array (fácil de iterar e estender)
@@ -42,7 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
             title: "Migração Alteryx → Databricks",
             description: "Projeto de modernização de workflows analíticos, reduzindo custos de licenciamento e melhorando governança e escalabilidade.",
             challenge: "Modernizar workflows existentes desenvolvidos em Alteryx e adaptar regras de negócio para um ambiente distribuído.",
-            role: "Análise dos workflows, mapeamento de regras de negócio e suporte na adaptação técnica para Databricks/Spark.",
+            role: ["Levantamento de regras de negócio", "Conversão para Databricks", "Validação funcional", "Comparação de resultados", "Documentação técnica", "Apoio à homologação"],
             technologies: ["Databricks", "Apache Spark", "Python", "SQL", "Engenharia de Dados", "Governança"],
             result: "Arquitetura modernizada com processos analíticos mais escaláveis e melhor governança."
         },
@@ -52,7 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
             title: "Adequação ao CNPJ Alfanumérico",
             description: "Preparação de sistemas, integrações e pipelines para suportar a evolução do padrão de identificação do CNPJ.",
             challenge: "Garantir compatibilidade com identificadores alfanuméricos sem impactar integrações legadas.",
-            role: "Levantamento de impactos, identificação de pontos críticos e apoio na estratégia de migração.",
+            role: ["Análise de impactos", "Validação de integrações", "Revisão de fluxos", "Adequação de arquivos XML", "Documentação técnica", "Suporte à homologação"],
             technologies: ["XML", "Shell Script", "Python", "IA Generativa", "Data Engineering", "Integrações"],
             result: "Componentes mapeados e preparados para uma transição controlada ao novo padrão regulatório."
         },
@@ -62,7 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
             title: "Adequação à Esteira DevOps",
             description: "Modernização de projetos legados para adoção de práticas de versionamento, automação e integração contínua.",
             challenge: "Reduzir dependências manuais e aumentar rastreabilidade em projetos sem fluxo de CI/CD.",
-            role: "Organização dos repositórios, definição de pipelines e estrutura de integração com a esteira corporativa.",
+            role: ["Estruturação de repositórios", "Azure DevOps", "Configuração CI/CD", "Versionamento", "Padronização de deploys", "Documentação técnica"],
             technologies: ["Azure DevOps", "Git", "YAML", "CI/CD", "Linux", "Shell Script"],
             result: "Maior padronização e automação dos processos de desenvolvimento e entrega."
         },
@@ -72,7 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
             title: "Data Warehouse para Análise de Negócios",
             description: "Projeto de modelagem dimensional e construção de um Data Warehouse para consolidar informações gerenciais e apoiar análises de negócio.",
             challenge: "Organizar dados de diferentes fontes em uma estrutura confiável, consistente e adequada para consultas analíticas.",
-            role: "Modelagem dimensional, definição de processos ETL e desenvolvimento de consultas analíticas em SQL.",
+            role: ["Modelagem dimensional", "Definição de processos ETL", "Desenvolvimento de consultas analíticas em SQL"],
             technologies: ["SQL", "ETL", "Data Warehousing", "Modelagem Dimensional", "SQL Server", "Power BI"],
             result: "Informações gerenciais consolidadas em uma estrutura preparada para análises e tomada de decisão."
         }
@@ -207,7 +209,7 @@ document.addEventListener("DOMContentLoaded", () => {
         document.addEventListener("mouseenter", () => cursorGlowEl.classList.add("visible"));
         document.addEventListener("mouseleave", () => cursorGlowEl.classList.remove("visible"));
 
-        const interactiveElements = document.querySelectorAll("a, button, .project-card, .profile-card, .result-card");
+        const interactiveElements = document.querySelectorAll("a, button, .project-card, .profile-card");
         interactiveElements.forEach((el) => {
             el.addEventListener("mouseenter", () => cursorGlowEl.classList.add("cursor-large"));
             el.addEventListener("mouseleave", () => cursorGlowEl.classList.remove("cursor-large"));
@@ -217,7 +219,7 @@ document.addEventListener("DOMContentLoaded", () => {
     /* ---------------- Scroll reveal (IntersectionObserver) --- */
     function initScrollReveal() {
         const animatedElements = document.querySelectorAll(
-            ".section-header, .about-content, .profile-card, .timeline-item, .featured-project, .project-card, .skills-column, .technology-cloud, .knowledge-content, .result-card, .objective-content, .contact-content"
+                ".section-header, .about-content, .profile-card, .timeline-item, .featured-project, .project-card, .academic-project-card, .impact-card, .skills-column, .technology-cloud, .knowledge-content, .objective-content, .certification-card, .contact-content"
         );
 
         if ("IntersectionObserver" in window && !prefersReducedMotion) {
@@ -243,7 +245,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const focusableSelector = 'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])';
         const hashProjectMap = {
             "projeto-databricks": "databricks",
-            "data-warehouse": "data-warehouse",
             "projeto-devops": "devops"
         };
 
@@ -260,7 +261,12 @@ document.addEventListener("DOMContentLoaded", () => {
             modalTitleEl.textContent = project.title;
             modalDescriptionEl.textContent = project.description;
             modalChallengeEl.textContent = project.challenge;
-            modalRoleEl.textContent = project.role;
+            modalRoleEl.innerHTML = "";
+            project.role.forEach((item) => {
+                const listItem = document.createElement("li");
+                listItem.textContent = item;
+                modalRoleEl.appendChild(listItem);
+            });
             modalResultEl.textContent = project.result;
 
             modalTechnologiesEl.innerHTML = "";
@@ -388,6 +394,37 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    /* ---------------- Reading progress and top button ----- */
+    function initScrollUtilities() {
+        if (!readingProgressBarEl && !backToTopEl) return;
+
+        let ticking = false;
+
+        function updateScrollUtilities() {
+            const documentHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = documentHeight > 0 ? Math.min(100, (window.scrollY / documentHeight) * 100) : 0;
+            if (readingProgressBarEl) readingProgressBarEl.style.width = `${progress}%`;
+            if (backToTopEl) backToTopEl.classList.toggle("is-visible", window.scrollY > 560);
+            ticking = false;
+        }
+
+        function requestScrollUpdate() {
+            if (ticking) return;
+            ticking = true;
+            window.requestAnimationFrame(updateScrollUtilities);
+        }
+
+        updateScrollUtilities();
+        window.addEventListener("scroll", requestScrollUpdate, { passive: true });
+        window.addEventListener("resize", requestScrollUpdate, { passive: true });
+
+        if (backToTopEl) {
+            backToTopEl.addEventListener("click", () => {
+                window.scrollTo({ top: 0, behavior: prefersReducedMotion ? "auto" : "smooth" });
+            });
+        }
+    }
+
     /* ---------------- Initialization ----------------------- */
     initNavigation();
     initMobileMenu();
@@ -397,8 +434,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initProjectCards();
     initHeroEffects();
     initTechHover();
+    initScrollUtilities();
 
-    console.log('Portfólio carregado com sucesso.');
-    projectCards = document.querySelectorAll('.project-card');
-    console.log(`${projectCards.length} projetos encontrados.`);
+    projectCards = document.querySelectorAll('.projects-section .project-card');
 });
