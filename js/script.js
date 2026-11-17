@@ -36,53 +36,60 @@ document.addEventListener("DOMContentLoaded", () => {
     let projectCards = document.querySelectorAll(".projects-section .project-card");
     const sections = document.querySelectorAll("main section[id]");
 
-    // Project data centralizada como array (fácil de iterar e estender)
-    const projects = [
-        {
-            id: "databricks",
-            category: "DATA ENGINEERING",
-            title: "Migração Alteryx → Databricks",
-            description: "Projeto de modernização de workflows analíticos, reduzindo custos de licenciamento e melhorando governança e escalabilidade.",
-            challenge: "Modernizar workflows existentes desenvolvidos em Alteryx e adaptar regras de negócio para um ambiente distribuído.",
-            role: ["Levantamento de regras de negócio", "Conversão para Databricks", "Validação funcional", "Comparação de resultados", "Documentação técnica", "Apoio à homologação"],
-            technologies: ["Databricks", "Apache Spark", "Python", "SQL", "Engenharia de Dados", "Governança"],
-            result: "Arquitetura modernizada com processos analíticos mais escaláveis e melhor governança."
-        },
-        {
-            id: "cnpj",
-            category: "DATA & REGULATORY",
-            title: "Adequação ao CNPJ Alfanumérico",
-            description: "Preparação de sistemas, integrações e pipelines para suportar a evolução do padrão de identificação do CNPJ.",
-            challenge: "Garantir compatibilidade com identificadores alfanuméricos sem impactar integrações legadas.",
-            role: ["Análise de impactos", "Validação de integrações", "Revisão de fluxos", "Adequação de arquivos XML", "Documentação técnica", "Suporte à homologação"],
-            technologies: ["XML", "Shell Script", "Python", "IA Generativa", "Data Engineering", "Integrações"],
-            result: "Componentes mapeados e preparados para uma transição controlada ao novo padrão regulatório."
-        },
-        {
-            id: "devops",
-            category: "DEVOPS",
-            title: "Adequação à Esteira DevOps",
-            description: "Modernização de projetos legados para adoção de práticas de versionamento, automação e integração contínua.",
-            challenge: "Reduzir dependências manuais e aumentar rastreabilidade em projetos sem fluxo de CI/CD.",
-            role: ["Estruturação de repositórios", "Azure DevOps", "Configuração CI/CD", "Versionamento", "Padronização de deploys", "Documentação técnica"],
-            technologies: ["Azure DevOps", "Git", "YAML", "CI/CD", "Linux", "Shell Script"],
-            result: "Maior padronização e automação dos processos de desenvolvimento e entrega."
-        },
-        {
-            id: "data-warehouse",
-            category: "DATA ENGINEERING",
-            title: "Data Warehouse para Análise de Negócios",
-            description: "Projeto de modelagem dimensional e construção de um Data Warehouse para consolidar informações gerenciais e apoiar análises de negócio.",
-            challenge: "Organizar dados de diferentes fontes em uma estrutura confiável, consistente e adequada para consultas analíticas.",
-            role: ["Modelagem dimensional", "Definição de processos ETL", "Desenvolvimento de consultas analíticas em SQL"],
-            technologies: ["SQL", "ETL", "Data Warehousing", "Modelagem Dimensional", "SQL Server", "Power BI"],
-            result: "Informações gerenciais consolidadas em uma estrutura preparada para análises e tomada de decisão."
+    // Modal state (single source of truth for modal lifecycle)
+    const __modalState = {
+        isOpen: false,
+        isClosing: false,
+        savedScrollY: 0,
+        lastFocused: null,
+        removeFocusTrap: null,
+        closeClickHandler: null,
+        overlayClickHandler: null,
+        docKeyHandler: null
+    };
+
+    // Projects will be loaded from assets/data/projects.json (single source of truth)
+    let projects = [];
+
+    async function loadProjects() {
+        // Provide clear guidance when opening via file:// which will make fetch fail
+        if (window.location.protocol === 'file:') {
+            console.error('Carregamento de projetos falhou: o navegador foi aberto via file://. Inicie um servidor HTTP local para testar (por exemplo: python3 -m http.server) e acesse via http://localhost:8000');
+            return;
         }
-    ];
+
+        try {
+            // resolve relative to the current document URL to be robust em GitHub Pages
+            const url = new URL('assets/data/projects.json', window.location.href).href;
+            const res = await fetch(url, { cache: 'no-store' });
+            if (!res.ok) throw new Error(`Failed to load projects.json: ${res.status}`);
+            projects = await res.json();
+        } catch (err) {
+            console.error('Erro ao carregar projects.json:', err);
+            projects = [];
+        }
+
+        // initialize project-related behaviors that depend on the data (only if data was loaded)
+        if (projects && projects.length) {
+            try {
+                initProjectModal();
+            } catch (e) {
+                console.error('Erro ao inicializar o modal de projetos:', e);
+            }
+        } else {
+            console.warn('Nenhum projeto carregado. Os modais só funcionarão quando assets/data/projects.json estiver acessível via HTTP.');
+        }
+    }
 
     /* ---------------------- Helpers ---------------------- */
     function findProjectById(id) {
         return projects.find((p) => p.id === id);
+    }
+
+    // Clear the URL hash without causing navigation / history entry
+    function clearProjectHash() {
+        const cleanUrl = `${window.location.pathname}${window.location.search}`;
+        try { window.history.replaceState(null, document.title, cleanUrl); } catch (e) { /* ignore */ }
     }
 
     /* ----------------- Navigation (desktop) ---------------- */
@@ -151,6 +158,9 @@ document.addEventListener("DOMContentLoaded", () => {
             document.body.classList.add("menu-open");
             navigationEl.setAttribute("aria-hidden", "false");
             menuOverlay.classList.add("active");
+            // move focus to first navigation link for accessibility
+            const firstNav = navigationEl.querySelector('.nav-link');
+            if (firstNav && typeof firstNav.focus === 'function') firstNav.focus();
         }
 
         function closeMenu() {
@@ -161,6 +171,8 @@ document.addEventListener("DOMContentLoaded", () => {
             document.body.classList.remove("menu-open");
             navigationEl.setAttribute("aria-hidden", "true");
             menuOverlay.classList.remove("active");
+            // restore focus to the toggle button
+            if (menuToggleEl && typeof menuToggleEl.focus === 'function') menuToggleEl.focus();
         }
 
         menuToggleEl.addEventListener("click", (e) => {
@@ -190,6 +202,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 menuToggleEl.setAttribute("aria-expanded", "false");
                 document.body.classList.remove("menu-open");
                 navigationEl.setAttribute("aria-hidden", "false");
+                // ensure overlay is removed when switching to desktop
+                if (menuOverlay && menuOverlay.classList) menuOverlay.classList.remove('active');
             }
         });
     }
@@ -198,42 +212,57 @@ document.addEventListener("DOMContentLoaded", () => {
     function initCursorGlow() {
         if (!cursorGlowEl || prefersReducedMotion) return;
         let mouseX = 0, mouseY = 0, glowX = 0, glowY = 0;
-        document.addEventListener("mousemove", (e) => { mouseX = e.clientX; mouseY = e.clientY; });
+        let rafId = null;
+
         function animate() {
-            glowX += (mouseX - glowX) * 0.12; glowY += (mouseY - glowY) * 0.12;
+            glowX += (mouseX - glowX) * 0.12;
+            glowY += (mouseY - glowY) * 0.12;
             cursorGlowEl.style.transform = `translate3d(${glowX}px, ${glowY}px, 0)`;
-            requestAnimationFrame(animate);
+            rafId = requestAnimationFrame(animate);
         }
-        animate();
 
-        document.addEventListener("mouseenter", () => cursorGlowEl.classList.add("visible"));
-        document.addEventListener("mouseleave", () => cursorGlowEl.classList.remove("visible"));
+        function start() {
+            if (rafId) return;
+            rafId = requestAnimationFrame(animate);
+        }
 
-        const interactiveElements = document.querySelectorAll("a, button, .project-card, .profile-card");
+        function stop() {
+            if (rafId) cancelAnimationFrame(rafId);
+            rafId = null;
+        }
+
+        document.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; start(); }, { passive: true });
+        document.addEventListener('mouseenter', () => cursorGlowEl.classList.add('visible'));
+        document.addEventListener('mouseleave', () => { cursorGlowEl.classList.remove('visible'); stop(); });
+
+        const interactiveElements = document.querySelectorAll('a, button, .project-card, .profile-card');
         interactiveElements.forEach((el) => {
-            el.addEventListener("mouseenter", () => cursorGlowEl.classList.add("cursor-large"));
-            el.addEventListener("mouseleave", () => cursorGlowEl.classList.remove("cursor-large"));
+            el.addEventListener('mouseenter', () => cursorGlowEl.classList.add('cursor-large'));
+            el.addEventListener('mouseleave', () => cursorGlowEl.classList.remove('cursor-large'));
         });
     }
 
     /* ---------------- Scroll reveal (IntersectionObserver) --- */
     function initScrollReveal() {
         const animatedElements = document.querySelectorAll(
-                ".section-header, .about-content, .profile-card, .timeline-item, .featured-project, .project-card, .academic-project-card, .impact-card, .skills-column, .technology-cloud, .knowledge-content, .objective-content, .certification-card, .contact-content"
+            ".section-header, .about-content, .profile-card, .timeline-item, .featured-project, .project-card, .academic-project-card, .impact-card, .skills-column, .technology-cloud, .knowledge-content, .objective-content, .certification-card, .contact-content"
         );
+
+        // Use the data-reveal attribute and .revealed class expected by CSS
+        animatedElements.forEach((el) => el.setAttribute('data-reveal', ''));
 
         if ("IntersectionObserver" in window && !prefersReducedMotion) {
             const observer = new IntersectionObserver((entries, obs) => {
                 entries.forEach((entry) => {
                     if (!entry.isIntersecting) return;
-                    entry.target.classList.add("active");
+                    entry.target.classList.add('revealed');
                     obs.unobserve(entry.target);
                 });
-            }, { threshold: 0.12, rootMargin: "0px 0px -60px 0px" });
+            }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
 
-            animatedElements.forEach((el) => { el.classList.add("reveal"); observer.observe(el); });
+            animatedElements.forEach((el) => observer.observe(el));
         } else {
-            animatedElements.forEach((el) => el.classList.add("active"));
+            animatedElements.forEach((el) => el.classList.add('revealed'));
         }
     }
 
@@ -241,115 +270,184 @@ document.addEventListener("DOMContentLoaded", () => {
     function initProjectModal() {
         if (!projectModalEl) return;
 
-        let lastFocused = null;
         const focusableSelector = 'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])';
-        const hashProjectMap = {
-            "projeto-databricks": "databricks",
-            "projeto-devops": "devops"
-        };
 
-        function clearProjectHash() {
-            const cleanUrl = `${window.location.pathname}${window.location.search}`;
-            window.history.replaceState(null, document.title, cleanUrl);
-        }
-
-        function openModal(projectId) {
-            const project = findProjectById(projectId);
-            if (!project) { console.warn(`Projeto "${projectId}" não encontrado.`); return; }
-
-            modalCategoryEl.textContent = project.category;
-            modalTitleEl.textContent = project.title;
-            modalDescriptionEl.textContent = project.description;
-            modalChallengeEl.textContent = project.challenge;
-            modalRoleEl.innerHTML = "";
-            project.role.forEach((item) => {
-                const listItem = document.createElement("li");
-                listItem.textContent = item;
-                modalRoleEl.appendChild(listItem);
-            });
-            modalResultEl.textContent = project.result;
-
-            modalTechnologiesEl.innerHTML = "";
-            project.technologies.forEach((t) => { const tag = document.createElement("span"); tag.textContent = t; modalTechnologiesEl.appendChild(tag); });
-
-            lastFocused = document.activeElement;
-
-            // lock scroll (preserve position)
-            const scrollY = window.scrollY; document.documentElement.style.setProperty('--scroll-y', `${scrollY}px`);
-            document.body.style.position = 'fixed';
-            document.body.style.top = `-${scrollY}px`;
-
-            projectModalEl.classList.add('active');
-            projectModalEl.setAttribute('aria-hidden', 'false');
-            document.body.classList.add('modal-open');
-            document.querySelector('main').setAttribute('aria-hidden', 'true');
-
-            // focus management
-            setTimeout(() => { modalCloseEl.focus(); }, 120);
-
-            // trap focus
-            trapFocusIn(projectModalEl);
-        }
-
-        function closeModal() {
-            projectModalEl.classList.remove('active');
-            projectModalEl.setAttribute('aria-hidden', 'true');
-            document.body.classList.remove('modal-open');
-            document.querySelector('main').setAttribute('aria-hidden', 'false');
-            clearProjectHash();
-
-            // restore scroll
-            const scrollY = document.body.style.top ? -parseInt(document.body.style.top || '0', 10) : 0;
-            document.body.style.position = '';
-            document.body.style.top = '';
-            window.scrollTo(0, scrollY);
-
-            // restore focus
-            if (lastFocused && typeof lastFocused.focus === 'function') lastFocused.focus();
-        }
-
-        function trapFocusIn(container) {
-            const focusable = Array.from(container.querySelectorAll(focusableSelector));
-            if (!focusable.length) return;
-            const first = focusable[0];
-            const last = focusable[focusable.length - 1];
-
-            function handleKey(e) {
-                if (e.key !== 'Tab') return;
-                if (e.shiftKey && document.activeElement === first) {
-                    e.preventDefault(); last.focus();
-                } else if (!e.shiftKey && document.activeElement === last) {
-                    e.preventDefault(); first.focus();
-                }
-            }
-
-            container.addEventListener('keydown', handleKey);
-            // remove listener when modal closes
-            const removeOnClose = () => { container.removeEventListener('keydown', handleKey); projectModalEl.removeEventListener('transitionend', removeOnClose); };
-            projectModalEl.addEventListener('transitionend', removeOnClose);
-        }
-
-        // bind openers
-        projectCards.forEach((card) => {
-            const projectId = card.dataset.project;
-            card.addEventListener('click', (ev) => {
-                if (ev.target.closest('.project-button')) return; // button handles separately
-                openModal(projectId);
-            });
-            const btn = card.querySelector('.project-button');
-            if (btn) btn.addEventListener('click', (ev) => { ev.preventDefault(); ev.stopPropagation(); openModal(projectId); });
+        // build map from existing articles with ids to their data-project values
+        const hashProjectMap = {};
+        document.querySelectorAll('.projects-grid article[id]').forEach((el) => {
+            const id = el.getAttribute('id');
+            const projectKey = el.dataset.project;
+            if (id && projectKey) hashProjectMap[id] = projectKey;
         });
 
-        // close bindings
-        modalCloseEl && modalCloseEl.addEventListener('click', closeModal);
-        modalOverlayEl && modalOverlayEl.addEventListener('click', closeModal);
-        document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && projectModalEl.classList.contains('active')) closeModal(); });
-
+        // helper: open from hash
         function openModalFromHash() {
             const projectId = hashProjectMap[window.location.hash.slice(1)];
             if (projectId) openModal(projectId);
         }
 
+        // focus trap function reuses global focusableSelector
+        function trapFocusIn(container) {
+            const focusable = Array.from(container.querySelectorAll(focusableSelector)).filter(el => {
+                try { return !(el.offsetWidth === 0 && el.offsetHeight === 0) || el.getAttribute('tabindex') === '0'; }
+                catch (e) { return true; }
+            });
+            if (!focusable.length) return null;
+            const first = focusable[0];
+            const last = focusable[focusable.length - 1];
+
+            function handleKey(e) {
+                if (e.key === 'Escape') { e.preventDefault(); closeModal(); return; }
+                if (e.key !== 'Tab') return;
+                if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+                else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+            }
+
+            function handleFocusIn(e) {
+                if (!container.contains(e.target)) {
+                    e.stopPropagation();
+                    try { first.focus({ preventScroll: true }); } catch (err) { first.focus(); }
+                }
+            }
+
+            document.addEventListener('keydown', handleKey);
+            document.addEventListener('focusin', handleFocusIn);
+
+            return () => { document.removeEventListener('keydown', handleKey); document.removeEventListener('focusin', handleFocusIn); };
+        }
+
+        // openModal uses __modalState for all state
+        function openModal(projectId) {
+            if (__modalState.isOpen || __modalState.isClosing) return;
+            const project = findProjectById(projectId);
+            if (!project) { console.warn(`Projeto \"${projectId}\" não encontrado.`); return; }
+
+            // fill modal
+            if (modalCategoryEl) modalCategoryEl.textContent = project.category;
+            if (modalTitleEl) modalTitleEl.textContent = project.title;
+            if (modalDescriptionEl) modalDescriptionEl.textContent = project.description;
+            if (modalChallengeEl) modalChallengeEl.textContent = project.challenge;
+            if (modalRoleEl) {
+                modalRoleEl.innerHTML = '';
+                project.role.forEach(item => { const li = document.createElement('li'); li.textContent = item; modalRoleEl.appendChild(li); });
+            }
+            if (modalTechnologiesEl) {
+                modalTechnologiesEl.innerHTML = '';
+                project.technologies.forEach(t => { const s = document.createElement('span'); s.textContent = t; modalTechnologiesEl.appendChild(s); });
+            }
+            if (modalResultEl) modalResultEl.textContent = project.result;
+
+            __modalState.lastFocused = document.activeElement;
+
+            // lock scroll
+            __modalState.savedScrollY = window.scrollY || window.pageYOffset || 0;
+            document.documentElement.style.setProperty('--scroll-y', `${__modalState.savedScrollY}px`);
+            document.body.style.position = 'fixed';
+            document.body.style.top = `-${__modalState.savedScrollY}px`;
+            document.body.classList.add('modal-open');
+
+            // show modal
+            projectModalEl.classList.add('active');
+            projectModalEl.setAttribute('aria-hidden', 'false');
+            __modalState.isOpen = true;
+
+            // focus modal close
+            try { if (modalCloseEl && typeof modalCloseEl.focus === 'function') modalCloseEl.focus({ preventScroll: true }); }
+            catch (e) { if (modalCloseEl && typeof modalCloseEl.focus === 'function') modalCloseEl.focus(); }
+
+            // after focus inside modal, hide main content from AT
+            const main = document.querySelector('main');
+            if (main) { try { main.inert = true; } catch (e) {} main.setAttribute('aria-hidden', 'true'); }
+
+            __modalState.removeFocusTrap = trapFocusIn(projectModalEl);
+
+            // attach close handlers idempotently
+            if (!__modalState.closeClickHandler && modalCloseEl) {
+                __modalState.closeClickHandler = (e) => { e.preventDefault(); closeModal(); };
+                modalCloseEl.addEventListener('click', __modalState.closeClickHandler);
+            }
+            if (!__modalState.overlayClickHandler && modalOverlayEl) {
+                __modalState.overlayClickHandler = (e) => { if (e.target === modalOverlayEl) closeModal(); };
+                modalOverlayEl.addEventListener('click', __modalState.overlayClickHandler);
+            }
+        }
+
+        function closeModal() {
+            if (!__modalState.isOpen || __modalState.isClosing) return;
+            __modalState.isClosing = true;
+
+            // remove focus trap immediately so Tab/Escape handling stops
+            if (typeof __modalState.removeFocusTrap === 'function') { __modalState.removeFocusTrap(); __modalState.removeFocusTrap = null; }
+
+            // Restore main accessibility BEFORE moving focus back to opener
+            const main = document.querySelector('main');
+            if (main) {
+                try { main.inert = false; } catch (e) { /* inert may be unsupported */ }
+                main.setAttribute('aria-hidden', 'false');
+            }
+
+            // Restore focus to the opener without scrolling the page (preferred)
+            try {
+                if (__modalState.lastFocused && typeof __modalState.lastFocused.focus === 'function') {
+                    __modalState.lastFocused.focus({ preventScroll: true });
+                }
+            } catch (err) {
+                try { if (__modalState.lastFocused && typeof __modalState.lastFocused.focus === 'function') __modalState.lastFocused.focus(); } catch (e2) { /* ignore */ }
+            }
+
+            // Now hide modal for AT (safe because focus is not inside modal)
+            projectModalEl.setAttribute('aria-hidden', 'true');
+
+            // compute transition/animation duration and use a safe fallback
+            const computed = window.getComputedStyle(projectModalEl);
+            const duration = Math.max(parseFloat(computed.transitionDuration || '0') || 0, parseFloat(computed.animationDuration || '0') || 0) * 1000;
+            const fallback = Math.max(200, Math.ceil(duration + 80));
+
+            let finished = false;
+            function finalize() {
+                if (finished) return; finished = true;
+
+                // hide visual state
+                projectModalEl.classList.remove('active');
+
+                // restore scroll position
+                const y = __modalState.savedScrollY || 0;
+                document.body.style.position = '';
+                document.body.style.top = '';
+                window.scrollTo(0, y);
+                document.body.classList.remove('modal-open');
+
+                // ensure opener has focus (best effort)
+                if (__modalState.lastFocused && typeof __modalState.lastFocused.focus === 'function') {
+                    try { __modalState.lastFocused.focus({ preventScroll: true }); } catch (err) { __modalState.lastFocused.focus(); }
+                }
+
+                // cleanup handlers
+                if (__modalState.closeClickHandler && modalCloseEl) { modalCloseEl.removeEventListener('click', __modalState.closeClickHandler); __modalState.closeClickHandler = null; }
+                if (__modalState.overlayClickHandler && modalOverlayEl) { modalOverlayEl.removeEventListener('click', __modalState.overlayClickHandler); __modalState.overlayClickHandler = null; }
+
+                // clear hash if present (defensive)
+                try { clearProjectHash(); } catch (e) { /* ignore */ }
+
+                __modalState.isOpen = false; __modalState.isClosing = false;
+            }
+
+            let settled = false;
+            const onEnd = (e) => { if (e && e.target !== projectModalEl) return; if (settled) return; settled = true; projectModalEl.removeEventListener('transitionend', onEnd); finalize(); };
+            projectModalEl.addEventListener('transitionend', onEnd);
+            setTimeout(() => { if (!settled) onEnd(); }, fallback);
+        }
+
+        // bind openers (cards and buttons)
+        projectCards.forEach((card) => {
+            const projectId = card.dataset.project;
+            if (!projectId) return;
+            card.addEventListener('click', (ev) => { if (ev.target.closest('.project-button')) return; openModal(projectId); });
+            const btn = card.querySelector('.project-button');
+            if (btn) btn.addEventListener('click', (ev) => { ev.preventDefault(); ev.stopPropagation(); openModal(projectId); });
+        });
+
+        // open from hash if present
         window.addEventListener('hashchange', openModalFromHash);
         openModalFromHash();
     }
@@ -430,11 +528,13 @@ document.addEventListener("DOMContentLoaded", () => {
     initMobileMenu();
     initCursorGlow();
     initScrollReveal();
-    initProjectModal();
+    // load projects (will call initProjectModal after data is ready)
+    loadProjects();
     initProjectCards();
     initHeroEffects();
     initTechHover();
     initScrollUtilities();
 
+    // refresh projectCards nodeList in case DOM changed
     projectCards = document.querySelectorAll('.projects-section .project-card');
 });

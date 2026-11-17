@@ -1,0 +1,53 @@
+[
+  {
+    "id": "databricks",
+    "category": "DATA ENGINEERING",
+    "title": "Migração Alteryx → Databricks",
+    "description": "Projeto de modernização de workflows analíticos, reduzindo custos de licenciamento e melhorando governança e escalabilidade.",
+    "challenge": "Modernizar workflows existentes desenvolvidos em Alteryx e adaptar regras de negócio para um ambiente distribuído.",
+    "role": [
+      "Levantamento de regras de negócio",
+      "Conversão para Databricks",
+      "Validação funcional",
+      "Comparação de resultados",
+      "Documentação técnica",
+      "Apoio à homologação"
+    ],
+    "technologies": ["Databricks", "Apache Spark", "Python", "SQL", "Engenharia de Dados", "Governança"],
+    "result": "Arquitetura modernizada com processos analíticos mais escaláveis e melhor governança."
+  },
+  {
+    "id": "cnpj",
+    "category": "DATA & REGULATORY",
+    "title": "Adequação CNPJ Alfanumérico",
+    "description": "Preparação de sistemas, integrações e pipelines para suportar a evolução do padrão de identificação do CNPJ.",
+    "challenge": "Garantir compatibilidade com identificadores alfanuméricos sem impactar integrações legadas.",
+    "role": [
+      "Análise de impactos",
+      "Validação de integrações",
+      "Revisão de fluxos",
+      "Adequação de arquivos XML",
+      "Documentação técnica",
+      "Suporte à homologação"
+    ],
+    "technologies": ["XML", "Shell Script", "Python", "Data Engineering", "Integrações"],
+    "result": "Componentes mapeados e preparados para uma transição controlada ao novo padrão regulatório."
+  },
+  {
+    "id": "devops",
+    "category": "DEVOPS",
+    "title": "Esteira DevOps",
+    "description": "Modernização de projetos legados para adoção de práticas de versionamento, automação e integração contínua.",
+    "challenge": "Reduzir dependências manuais e aumentar rastreabilidade em projetos sem fluxo de CI/CD.",
+    "role": [
+      "Estruturação de repositórios",
+      "Azure DevOps",
+      "Configuração CI/CD",
+      "Versionamento",
+      "Padronização de deploys",
+      "Documentação técnica"
+    ],
+    "technologies": ["Azure DevOps", "Git", "YAML", "CI/CD", "Linux", "Shell Script"],
+    "result": "Maior padronização e automação dos processos de desenvolvimento e entrega."
+  }
+]
