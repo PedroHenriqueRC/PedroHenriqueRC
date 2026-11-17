@@ -338,6 +338,8 @@ document.addEventListener("DOMContentLoaded", () => {
             if (modalResultEl) modalResultEl.textContent = project.result;
 
             __modalState.lastFocused = document.activeElement;
+            console.debug('[modal] openModal:', projectId, 'savedScrollY=', __modalState.savedScrollY, 'lastFocused=', __modalState.lastFocused && (__modalState.lastFocused.id || __modalState.lastFocused.className || __modalState.lastFocused.tagName));
+            console.debug('[modal] activeElement after open:', document.activeElement && (document.activeElement.id || document.activeElement.className || document.activeElement.tagName));
 
             // lock scroll
             __modalState.savedScrollY = window.scrollY || window.pageYOffset || 0;
@@ -354,10 +356,39 @@ document.addEventListener("DOMContentLoaded", () => {
             // focus modal close
             try { if (modalCloseEl && typeof modalCloseEl.focus === 'function') modalCloseEl.focus({ preventScroll: true }); }
             catch (e) { if (modalCloseEl && typeof modalCloseEl.focus === 'function') modalCloseEl.focus(); }
+            console.debug('[modal] attempted focus on close button:', modalCloseEl && (modalCloseEl.id || modalCloseEl.className || modalCloseEl.tagName));
+            console.debug('[modal] activeElement immediately after focus attempt:', document.activeElement && (document.activeElement.id || document.activeElement.className || document.activeElement.tagName));
 
-            // after focus inside modal, hide main content from AT
-            const main = document.querySelector('main');
-            if (main) { try { main.inert = true; } catch (e) {} main.setAttribute('aria-hidden', 'true'); }
+            // after giving focus to the modal, retry a few times to ensure focus actually moves into modal
+            // before we set main inert/aria-hidden. This avoids the browser blocking aria-hidden when a
+            // descendant still has focus (common if the opener was a button that retains focus briefly).
+            (function tryHideMain(attempt) {
+                attempt = attempt || 0;
+                const main = document.querySelector('main');
+                try {
+                    console.debug('[modal] tryHideMain attempt', attempt, 'activeElement=', document.activeElement && (document.activeElement.id || document.activeElement.className || document.activeElement.tagName));
+                    if (projectModalEl.contains(document.activeElement)) {
+                        if (main) { try { main.inert = true; } catch (e) {} main.setAttribute('aria-hidden', 'true'); }
+                        return;
+                    }
+
+                    // attempt to focus the modal close again
+                    if (modalCloseEl && typeof modalCloseEl.focus === 'function') {
+                        try { modalCloseEl.focus({ preventScroll: true }); } catch (e) { try { modalCloseEl.focus(); } catch (e2) { /* ignore */ } }
+                    }
+
+                    // if still not focused inside modal, retry a few times then fall back to blurring the active element
+                    if (attempt < 12) {
+                        console.debug('[modal] retrying hide main, attempt', attempt + 1);
+                        setTimeout(() => tryHideMain(attempt + 1), 40);
+                    } else {
+                        try { document.activeElement && document.activeElement.blur && document.activeElement.blur(); } catch (e) { /* ignore */ }
+                        if (main) { try { main.inert = true; } catch (e) {} main.setAttribute('aria-hidden', 'true'); }
+                    }
+                } catch (e) {
+                    if (main) { try { main.inert = true; } catch (ee) {} main.setAttribute('aria-hidden', 'true'); }
+                }
+            })(0);
 
             __modalState.removeFocusTrap = trapFocusIn(projectModalEl);
 
@@ -365,6 +396,14 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!__modalState.closeClickHandler && modalCloseEl) {
                 __modalState.closeClickHandler = (e) => { e.preventDefault(); closeModal(); };
                 modalCloseEl.addEventListener('click', __modalState.closeClickHandler);
+                // ensure pointerdown blurs any active element before click — prevents aria-hidden being set while focus remains inside modal
+                if (!__modalState.closePointerHandler) {
+                    __modalState.closePointerHandler = () => {
+                        try { document.activeElement && document.activeElement.blur && document.activeElement.blur(); } catch (err) { /* ignore */ }
+                        console.debug('[modal] pointerdown: blurred activeElement before click');
+                    };
+                    modalCloseEl.addEventListener('pointerdown', __modalState.closePointerHandler);
+                }
             }
             if (!__modalState.overlayClickHandler && modalOverlayEl) {
                 __modalState.overlayClickHandler = (e) => { if (e.target === modalOverlayEl) closeModal(); };
@@ -386,17 +425,47 @@ document.addEventListener("DOMContentLoaded", () => {
                 main.setAttribute('aria-hidden', 'false');
             }
 
-            // Restore focus to the opener without scrolling the page (preferred)
-            try {
-                if (__modalState.lastFocused && typeof __modalState.lastFocused.focus === 'function') {
-                    __modalState.lastFocused.focus({ preventScroll: true });
+            // Restaurar o conteúdo principal antes de transferir o foco
+            const opener = __modalState.lastFocused;
+
+            // Try to move focus back to the opener if possible
+            if (opener && opener.isConnected && typeof opener.focus === 'function') {
+                try { opener.focus({ preventScroll: true }); } catch (e) { try { opener.focus(); } catch (e2) { /* ignore */ } }
+            } else {
+                // If opener is not available, create a temporary off-screen focusable element
+                // and focus it to ensure focus leaves the modal before setting aria-hidden.
+                let tmp = null;
+                try {
+                    tmp = document.createElement('div');
+                    tmp.tabIndex = -1;
+                    tmp.setAttribute('aria-hidden', 'true');
+                    tmp.style.position = 'absolute';
+                    tmp.style.left = '-9999px';
+                    tmp.style.width = '1px';
+                    tmp.style.height = '1px';
+                    document.body.appendChild(tmp);
+                    try { tmp.focus({ preventScroll: true }); } catch (e) { try { tmp.focus(); } catch (e2) { /* ignore */ } }
+                } catch (e) {
+                    /* ignore temporary focus element failures */
+                } finally {
+                    try { if (tmp && tmp.parentNode) tmp.parentNode.removeChild(tmp); } catch (e) { /* ignore */ }
                 }
-            } catch (err) {
-                try { if (__modalState.lastFocused && typeof __modalState.lastFocused.focus === 'function') __modalState.lastFocused.focus(); } catch (e2) { /* ignore */ }
             }
 
-            // Now hide modal for AT (safe because focus is not inside modal)
-            projectModalEl.setAttribute('aria-hidden', 'true');
+            // Só ocultar o modal se o foco realmente saiu dele. Tentar um blur como último recurso.
+            if (!projectModalEl.contains(document.activeElement)) {
+                projectModalEl.setAttribute('aria-hidden', 'true');
+            } else {
+                try { document.activeElement && document.activeElement.blur && document.activeElement.blur(); } catch (e) { /* ignore */ }
+
+                if (!projectModalEl.contains(document.activeElement)) {
+                    projectModalEl.setAttribute('aria-hidden', 'true');
+                } else {
+                    console.error('[modal] Não foi possível transferir o foco para fora do modal.');
+                    __modalState.isClosing = false;
+                    return;
+                }
+            }
 
             // compute transition/animation duration and use a safe fallback
             const computed = window.getComputedStyle(projectModalEl);
@@ -409,22 +478,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 // hide visual state
                 projectModalEl.classList.remove('active');
-
-                // restore scroll position
-                const y = __modalState.savedScrollY || 0;
+                // restore body positioning so the document is scrollable again
                 document.body.style.position = '';
                 document.body.style.top = '';
-                window.scrollTo(0, y);
                 document.body.classList.remove('modal-open');
 
-                // ensure opener has focus (best effort)
+                // then restore scroll position without smooth behavior
+                const y = __modalState.savedScrollY || 0;
+                try { document.documentElement.classList.add('disable-smooth-scroll'); } catch (e) { /* ignore */ }
+                try {
+                    window.scrollTo(0, y);
+                } catch (e) {
+                    /* ignore */
+                }
+                // remove the class shortly after to re-enable smooth scrolling
+                setTimeout(() => { try { document.documentElement.classList.remove('disable-smooth-scroll'); } catch (e) { /* ignore */ } }, 60);
+
+                // ensure opener has focus (best effort) after restoring scroll
                 if (__modalState.lastFocused && typeof __modalState.lastFocused.focus === 'function') {
-                    try { __modalState.lastFocused.focus({ preventScroll: true }); } catch (err) { __modalState.lastFocused.focus(); }
+                    try { __modalState.lastFocused.focus({ preventScroll: true }); } catch (err) { try { __modalState.lastFocused.focus(); } catch (err2) { /* ignore */ } }
                 }
 
                 // cleanup handlers
                 if (__modalState.closeClickHandler && modalCloseEl) { modalCloseEl.removeEventListener('click', __modalState.closeClickHandler); __modalState.closeClickHandler = null; }
                 if (__modalState.overlayClickHandler && modalOverlayEl) { modalOverlayEl.removeEventListener('click', __modalState.overlayClickHandler); __modalState.overlayClickHandler = null; }
+                if (__modalState.closePointerHandler && modalCloseEl) { modalCloseEl.removeEventListener('pointerdown', __modalState.closePointerHandler); __modalState.closePointerHandler = null; }
 
                 // clear hash if present (defensive)
                 try { clearProjectHash(); } catch (e) { /* ignore */ }
