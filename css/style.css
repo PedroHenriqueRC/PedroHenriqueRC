@@ -2168,10 +2168,10 @@ div {
 }
 
 .contact-content {
-    width: min(calc(100% - 48px), 
+    width: min(calc(100% - 48px),
             var(--container));
 
-    margin-left: max(24px, 
+    margin-left: max(24px,
             calc((85vw - var(--container)) / 2));
 
     max-width: 850px;
@@ -2254,9 +2254,16 @@ div {
 }
 
 .contact-arrow {
+    width: 16px;
+    height: 16px;
+    flex: 0 0 16px;
     color: var(--text-soft);
 
-    font-size: 14px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
 
     transition:
         color var(--transition-fast),
@@ -2285,6 +2292,69 @@ div {
 
     transform:
         translate(3px, -3px);
+}
+
+.resume-action {
+    position: relative;
+    min-width: 150px;
+}
+
+.resume-trigger {
+    width: 100%;
+}
+
+.resume-menu {
+    position: absolute;
+    right: 0;
+    bottom: calc(100% + 10px);
+    z-index: 4;
+    min-width: 170px;
+    padding: 6px;
+    border: 1px solid var(--border-strong);
+    border-radius: 10px;
+    background: rgba(8, 11, 17, 0.96);
+    box-shadow: var(--shadow-md);
+    backdrop-filter: blur(14px);
+}
+
+.resume-menu[hidden] {
+    display: none;
+}
+
+.resume-menu a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 11px;
+    border-radius: 6px;
+    color: var(--text-soft);
+    font-size: 12px;
+    transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.resume-menu a:hover,
+.resume-menu a:focus-visible {
+    background: rgba(91, 140, 255, 0.1);
+    color: var(--text);
+}
+
+.resume-menu i {
+    width: 16px;
+    color: var(--primary-light);
+    text-align: center;
+}
+
+@media (max-width: 600px) {
+    .resume-action {
+        width: 100%;
+    }
+
+    .resume-menu {
+        right: auto;
+        left: 0;
+        bottom: calc(100% + 8px);
+        width: min(100%, 220px);
+    }
 }
 
 .contact-section>img {
@@ -3714,12 +3784,12 @@ div {
     line-height: 1.5;
 }
 
-    .academic-project-grid {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 15px;
-        margin-top: 80px;
-    }
+.academic-project-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 15px;
+    margin-top: 80px;
+}
 
 .academic-project-card {
     min-height: 390px;

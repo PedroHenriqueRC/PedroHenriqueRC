@@ -20,6 +20,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const cursorGlowEl = document.querySelector(".cursor-glow");
     const readingProgressBarEl = document.getElementById("reading-progress-bar");
     const backToTopEl = document.getElementById("back-to-top");
+    const resumeTriggerEl = document.getElementById("resume-trigger");
+    const resumeMenuEl = document.getElementById("resume-menu");
 
     const projectModalEl = document.getElementById("project-modal");
     const modalOverlayEl = document.getElementById("modal-overlay");
@@ -357,7 +359,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // after focus inside modal, hide main content from AT
             const main = document.querySelector('main');
-            if (main) { try { main.inert = true; } catch (e) {} main.setAttribute('aria-hidden', 'true'); }
+            if (main) { try { main.inert = true; } catch (e) { } main.setAttribute('aria-hidden', 'true'); }
 
             __modalState.removeFocusTrap = trapFocusIn(projectModalEl);
 
@@ -492,6 +494,58 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    /* ---------------- Resume actions ----------------------- */
+    function initResumeMenu() {
+        if (!resumeTriggerEl || !resumeMenuEl) return;
+
+        function closeMenu() {
+            resumeMenuEl.hidden = true;
+            resumeTriggerEl.setAttribute("aria-expanded", "false");
+        }
+
+        function toggleMenu() {
+            const isOpen = resumeMenuEl.hidden;
+            resumeMenuEl.hidden = !isOpen;
+            resumeTriggerEl.setAttribute("aria-expanded", String(isOpen));
+        }
+
+        resumeTriggerEl.addEventListener("click", toggleMenu);
+        resumeMenuEl.querySelectorAll("a").forEach((link) => link.addEventListener("click", closeMenu));
+        const downloadLink = resumeMenuEl.querySelector(".resume-download");
+        if (downloadLink) {
+            downloadLink.addEventListener("click", async (event) => {
+                event.preventDefault();
+                downloadLink.setAttribute("aria-busy", "true");
+
+                try {
+                    const response = await fetch(downloadLink.href);
+                    if (!response.ok) throw new Error(`Download failed: ${response.status}`);
+
+                    const pdfBlob = await response.blob();
+                    const blobUrl = URL.createObjectURL(pdfBlob);
+                    const temporaryLink = document.createElement("a");
+                    temporaryLink.href = blobUrl;
+                    temporaryLink.download = downloadLink.getAttribute("download") || "curriculo.pdf";
+                    document.body.appendChild(temporaryLink);
+                    temporaryLink.click();
+                    temporaryLink.remove();
+                    URL.revokeObjectURL(blobUrl);
+                } catch (error) {
+                    // Fallback for local previews or browsers that block Blob downloads.
+                    window.location.href = downloadLink.href;
+                } finally {
+                    downloadLink.removeAttribute("aria-busy");
+                }
+            });
+        }
+        document.addEventListener("click", (event) => {
+            if (!event.target.closest(".resume-action")) closeMenu();
+        });
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") closeMenu();
+        });
+    }
+
     /* ---------------- Reading progress and top button ----- */
     function initScrollUtilities() {
         if (!readingProgressBarEl && !backToTopEl) return;
@@ -534,6 +588,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initHeroEffects();
     initTechHover();
     initScrollUtilities();
+    initResumeMenu();
 
     // refresh projectCards nodeList in case DOM changed
     projectCards = document.querySelectorAll('.projects-section .project-card');
