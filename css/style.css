@@ -66,6 +66,11 @@ html {
     overflow-x: hidden;
 }
 
+/* Utility to temporarily disable smooth scrolling when scripts need instant scroll */
+html.disable-smooth-scroll {
+    scroll-behavior: auto !important;
+}
+
 body {
     min-height: 100vh;
     min-height: 100dvh;
@@ -3747,12 +3752,6 @@ div {
     background: var(--bg);
 }
 
-.impact-grid {
-    display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 12px;
-}
-
 .impact-card {
     min-height: 190px;
     padding: 28px 22px;
@@ -3784,31 +3783,32 @@ div {
     line-height: 1.5;
 }
 
-.academic-project-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 15px;
-    margin-top: 80px;
-}
+    .academic-project-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 15px;
+        margin-top: 80px;
+    }
 
-.academic-project-card {
-    min-height: 390px;
-    cursor: default;
-}
+    .academic-project-card {
+        min-height: 390px;
+        cursor: default;
+    }
 
-.academic-project-card:hover {
-    transform: translateY(-8px);
-}
+    .academic-project-card:hover {
+        transform: translateY(-8px);
+    }
 
-.academic-project-card .project-card-body p {
-    margin-top: 14px;
-    color: var(--text-muted);
-    font-size: 13px;
-    line-height: 1.65;
-}
+    .academic-project-card .project-card-body p {
+        margin-top: 14px;
+        color: var(--text-muted);
+        font-size: 13px;
+        line-height: 1.65;
+    }
 
-.academic-project-card .project-card-body strong {
-    color: var(--text-soft);
+    .academic-project-card .project-card-body strong {
+        color: var(--text-soft);
+    }
 }
 
 .certifications-section {
@@ -3948,6 +3948,29 @@ div {
 
 .certification-card h3 {
     margin-top: 14px;
+}
+
+/* Mobile: stack certification cards for narrow screens */
+@media (max-width: 850px) {
+    .certification-card {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 18px;
+        gap: 12px;
+    }
+
+    .certification-icon {
+        margin-bottom: 8px;
+        flex: 0 0 44px;
+    }
+
+    .certification-card>div {
+        width: 100%;
+    }
+
+    .certification-card h3 {
+        margin-top: 6px;
+    }
 }
 
 @media (max-width: 600px) {
