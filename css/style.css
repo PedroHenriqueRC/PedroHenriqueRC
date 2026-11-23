@@ -904,14 +904,54 @@ div {
 }
 
 .code-window-header span {
-    width: 8px;
-    height: 8px;
+    width: 12px;
+    height: 12px;
 
     flex-shrink: 0;
 
+    display: grid;
+    place-items: center;
+
+    border: 0.5px solid rgba(0, 0, 0, 0.35);
     border-radius: 50%;
 
-    background: rgba(255, 255, 255, 0.2);
+    line-height: 1;
+}
+
+.code-window-header .window-control {
+    position: relative;
+
+    cursor: default;
+}
+
+.code-window-header .close {
+    background: #ff5f57;
+}
+
+.code-window-header .minimize {
+    background: #febc2e;
+}
+
+.code-window-header .maximize {
+    background: #28c840;
+}
+
+.code-window-header .window-control svg {
+    width: 8px;
+    height: 8px;
+
+    fill: none;
+    stroke: rgba(55, 55, 55, 0.9);
+    stroke-width: 1.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+}
+
+.code-window-header:hover .window-control svg {
+    opacity: 1;
 }
 
 .code-window-content {
@@ -1027,10 +1067,10 @@ div {
 }
 
 .tech-databricks {
-    bottom: 8%;
-    right: 10%;
+    bottom: 10%;
+    right: 2%;
 
-    animation-delay: 3s;
+    animation-delay: 4s;
 }
 
 @keyframes floatTech {
@@ -2208,13 +2248,14 @@ div {
 }
 
 .contact-link {
-    min-width: 150px;
+    flex: 1 1 0;
+    min-width: 130px;
 
     display: flex;
     align-items: center;
     justify-content: space-between;
 
-    gap: 20px;
+    gap: 0px;
 
     padding: 17px 20px;
 
@@ -3038,6 +3079,15 @@ div {
 }
 
 
+@media (min-width: 601px) and (max-width: 850px) {
+    .contact-link {
+        gap: 10px;
+
+        padding-inline: 12px;
+    }
+}
+
+
 @media (max-width: 600px) {
 
     :root {
@@ -3691,6 +3741,10 @@ div {
         display: none;
     }
 
+    .code-window-header .window-control svg {
+        opacity: 1;
+    }
+
     .project-card:hover,
     .profile-card:hover,
     .button:hover,
@@ -3752,6 +3806,12 @@ div {
     background: var(--bg);
 }
 
+.impact-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 15px;
+}
+
 .impact-card {
     min-height: 190px;
     padding: 28px 22px;
@@ -3808,7 +3868,6 @@ div {
 
     .academic-project-card .project-card-body strong {
         color: var(--text-soft);
-    }
 }
 
 .certifications-section {
@@ -3988,4 +4047,54 @@ div {
 
 .academic-project-card .project-card-body {
     padding-bottom: 20px;
+}
+
+@media (max-width: 600px) {
+    .academic-project-grid,
+    .impact-grid,
+    .certification-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .academic-project-grid {
+        gap: 16px;
+        margin-top: 32px;
+    }
+
+    .academic-project-card {
+        min-height: auto;
+    }
+
+    .academic-project-card .project-card-body {
+        padding: 18px 18px 8px;
+    }
+
+    .academic-project-card .project-card-footer,
+    .project-card-footer {
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 14px 18px 18px;
+    }
+
+    .impact-grid {
+        gap: 12px;
+    }
+
+    .impact-card {
+        min-height: 150px;
+        padding: 22px 18px;
+    }
+
+    .impact-card strong {
+        font-size: 36px;
+    }
+
+    .impact-card span {
+        margin-top: 16px;
+        max-width: 280px;
+    }
+
+    .certification-card {
+        min-height: auto;
+    }
 }
