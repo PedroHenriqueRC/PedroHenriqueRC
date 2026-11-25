@@ -1,12 +1,4 @@
-/* =========================================================
-   PORTFÓLIO — PEDRO HENRIQUE
-   JavaScript principal
-========================================================= */
-
-/* =========================================================
-   PORTFÓLIO — PEDRO HENRIQUE
-   JavaScript principal (refatorado em módulos)
-========================================================= */
+/* Interações da página e modal de projetos. */
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -34,11 +26,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const modalRoleEl = document.getElementById("modal-role");
     const modalTechnologiesEl = document.getElementById("modal-technologies");
     const modalResultEl = document.getElementById("modal-result");
+    const modalVisualEl = document.getElementById("modal-visual");
 
-    let projectCards = document.querySelectorAll(".projects-section .project-card");
+    let projectCards = document.querySelectorAll(".projects-section .project-card, .academic-section .project-card");
     const sections = document.querySelectorAll("main section[id]");
 
-    // Modal state (single source of truth for modal lifecycle)
+    // Estado do modal (fonte unica da verdade para seu ciclo de vida)
     const __modalState = {
         isOpen: false,
         isClosing: false,
@@ -47,34 +40,33 @@ document.addEventListener("DOMContentLoaded", () => {
         removeFocusTrap: null,
         closeClickHandler: null,
         overlayClickHandler: null,
-        docKeyHandler: null
     };
 
-    // Projects will be loaded from assets/data/projects.json (single source of truth)
+    // Os projetos serao carregados de assets/data/projects.json (fonte unica da verdade)
     let projects = [];
 
-    async function loadProjects() {
-        // Provide clear guidance when opening via file:// which will make fetch fail
+    async function carregarProjetos() {
+        // Orienta sobre o uso de file://, que impede o funcionamento de fetch
         if (window.location.protocol === 'file:') {
             console.error('Carregamento de projetos falhou: o navegador foi aberto via file://. Inicie um servidor HTTP local para testar (por exemplo: python3 -m http.server) e acesse via http://localhost:8000');
             return;
         }
 
         try {
-            // resolve relative to the current document URL to be robust em GitHub Pages
+            // Resolve a URL em relacao ao documento atual para funcionar no GitHub Pages
             const url = new URL('assets/data/projects.json', window.location.href).href;
             const res = await fetch(url, { cache: 'no-store' });
-            if (!res.ok) throw new Error(`Failed to load projects.json: ${res.status}`);
+            if (!res.ok) throw new Error(`Falha ao carregar projects.json: ${res.status}`);
             projects = await res.json();
         } catch (err) {
             console.error('Erro ao carregar projects.json:', err);
             projects = [];
         }
 
-        // initialize project-related behaviors that depend on the data (only if data was loaded)
+        // Inicializa os comportamentos dos projetos somente se os dados forem carregados
         if (projects && projects.length) {
             try {
-                initProjectModal();
+            inicializarModalDeProjetos();
             } catch (e) {
                 console.error('Erro ao inicializar o modal de projetos:', e);
             }
@@ -83,26 +75,64 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    /* ---------------------- Helpers ---------------------- */
-    function findProjectById(id) {
+    /* ---------------------- Funcoes auxiliares ---------------------- */
+    function encontrarProjetoPorId(id) {
         return projects.find((p) => p.id === id);
     }
 
-    // Clear the URL hash without causing navigation / history entry
-    function clearProjectHash() {
-        const cleanUrl = `${window.location.pathname}${window.location.search}`;
-        try { window.history.replaceState(null, document.title, cleanUrl); } catch (e) { /* ignore */ }
+    function atualizarTempoDeTrabalho() {
+        const durationEl = document.getElementById("calctempotrabalho");
+        if (!durationEl) return;
+
+        const match = durationEl.dataset.startDate?.match(/^(\d{4})-(\d{2})$/);
+        if (!match) return;
+
+        const startYear = Number(match[1]);
+        const startMonth = Number(match[2]);
+        if (startMonth < 1 || startMonth > 12) return;
+
+        const dataFixaParaTeste = null; 
+        const now = dataFixaParaTeste ? new Date(`${dataFixaParaTeste}T09:00:00`) : new Date();
+        const currentYear = now.getFullYear();
+        const currentMonth = now.getMonth() + 1;
+        const startMonthIndex = startYear * 12 + startMonth - 1;
+        const currentMonthIndex = currentYear * 12 + currentMonth - 1;
+
+        if (currentMonthIndex < startMonthIndex) {
+            const startLabel = new Date(startYear, startMonth - 1, 1).toLocaleDateString("pt-BR", {
+                month: "long",
+                year: "numeric"
+            });
+            durationEl.textContent = `início previsto para ${startLabel}`;
+            return;
+        }
+
+        const elapsedMonths = currentMonthIndex - startMonthIndex + 1;
+        const years = Math.floor(elapsedMonths / 12);
+        const months = elapsedMonths % 12;
+        const parts = [];
+
+        if (years > 0) parts.push(`${years} ${years === 1 ? "ano" : "anos"}`);
+        if (months > 0) parts.push(`${months} ${months === 1 ? "mês" : "meses"}`);
+
+        durationEl.textContent = parts.join(" e ");
     }
 
-    /* ----------------- Navigation (desktop) ---------------- */
-    function initNavigation() {
-        function updateNavbar() {
+    // Limpa o fragmento da URL sem navegar nem criar uma entrada no historico
+    function limparHashDoProjeto() {
+        const cleanUrl = `${window.location.pathname}${window.location.search}`;
+        try { window.history.replaceState(null, document.title, cleanUrl); } catch (e) { /* ignorar */ }
+    }
+
+    /* ----------------- Navegacao (desktop) ---------------- */
+    function inicializarNavegacao() {
+        function atualizarBarraDeNavegacao() {
             if (!navbarEl) return;
             if (window.scrollY > 40) navbarEl.classList.add("scrolled");
             else navbarEl.classList.remove("scrolled");
         }
 
-        function updateActiveNavigation() {
+        function atualizarNavegacaoAtiva() {
             let currentSection = "";
             const scrollPosition = window.scrollY + 180;
             sections.forEach((section) => {
@@ -119,13 +149,13 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
 
-        updateNavbar();
-        updateActiveNavigation();
+        atualizarBarraDeNavegacao();
+        atualizarNavegacaoAtiva();
 
-        window.addEventListener("scroll", updateNavbar, { passive: true });
-        window.addEventListener("scroll", updateActiveNavigation, { passive: true });
+        window.addEventListener("scroll", atualizarBarraDeNavegacao, { passive: true });
+        window.addEventListener("scroll", atualizarNavegacaoAtiva, { passive: true });
 
-        // Smooth scroll with navbar offset
+        // Rolagem suave considerando a altura da barra de navegacao
         document.querySelectorAll('a[href^="#"]').forEach((link) => {
             link.addEventListener("click", (event) => {
                 const targetId = link.getAttribute("href");
@@ -140,11 +170,11 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    /* ---------------- Mobile menu (accessible) --------------- */
-    function initMobileMenu() {
+    /* ---------------- Menu movel (acessivel) --------------- */
+    function inicializarMenuMovel() {
         if (!menuToggleEl || !navigationEl) return;
 
-        // create overlay element if not present
+        // Cria a sobreposicao caso ainda nao exista
         let menuOverlay = document.querySelector(".menu-overlay");
         if (!menuOverlay) {
             menuOverlay = document.createElement("div");
@@ -152,7 +182,7 @@ document.addEventListener("DOMContentLoaded", () => {
             document.body.appendChild(menuOverlay);
         }
 
-        function openMenu() {
+        function abrirMenuMovel() {
             navigationEl.classList.add("active");
             menuToggleEl.classList.add("active");
             menuToggleEl.setAttribute("aria-expanded", "true");
@@ -160,12 +190,12 @@ document.addEventListener("DOMContentLoaded", () => {
             document.body.classList.add("menu-open");
             navigationEl.setAttribute("aria-hidden", "false");
             menuOverlay.classList.add("active");
-            // move focus to first navigation link for accessibility
+            // Move o foco para o primeiro link de navegacao por acessibilidade
             const firstNav = navigationEl.querySelector('.nav-link');
             if (firstNav && typeof firstNav.focus === 'function') firstNav.focus();
         }
 
-        function closeMenu() {
+        function fecharMenuMovel() {
             navigationEl.classList.remove("active");
             menuToggleEl.classList.remove("active");
             menuToggleEl.setAttribute("aria-expanded", "false");
@@ -173,7 +203,7 @@ document.addEventListener("DOMContentLoaded", () => {
             document.body.classList.remove("menu-open");
             navigationEl.setAttribute("aria-hidden", "true");
             menuOverlay.classList.remove("active");
-            // restore focus to the toggle button
+            // Devolve o foco ao botao de menu
             if (menuToggleEl && typeof menuToggleEl.focus === 'function') menuToggleEl.focus();
         }
 
@@ -187,16 +217,16 @@ document.addEventListener("DOMContentLoaded", () => {
             menuOverlay.classList.toggle("active", isOpen);
         });
 
-        navLinks.forEach((link) => link.addEventListener("click", () => closeMenu()));
+        navLinks.forEach((link) => link.addEventListener("click", () => fecharMenuMovel()));
 
-        menuOverlay.addEventListener("click", closeMenu);
+        menuOverlay.addEventListener("click", fecharMenuMovel);
 
-        // close on ESC
+        // Fecha ao pressionar Escape
         document.addEventListener("keydown", (e) => {
-            if (e.key === "Escape" && navigationEl.classList.contains("active")) closeMenu();
+            if (e.key === "Escape" && navigationEl.classList.contains("active")) fecharMenuMovel();
         });
 
-        // ensure menu closes on resize
+        // Garante que o menu feche ao redimensionar a janela
         window.addEventListener("resize", () => {
             if (window.innerWidth > 900) {
                 navigationEl.classList.remove("active");
@@ -204,38 +234,38 @@ document.addEventListener("DOMContentLoaded", () => {
                 menuToggleEl.setAttribute("aria-expanded", "false");
                 document.body.classList.remove("menu-open");
                 navigationEl.setAttribute("aria-hidden", "false");
-                // ensure overlay is removed when switching to desktop
+                // Remove a sobreposicao ao alternar para o layout desktop
                 if (menuOverlay && menuOverlay.classList) menuOverlay.classList.remove('active');
             }
         });
     }
 
-    /* ---------------- Cursor glow (desktop only) ------------- */
-    function initCursorGlow() {
+    /* ---------------- Brilho do cursor (somente desktop) ------------- */
+    function inicializarBrilhoDoCursor() {
         if (!cursorGlowEl || prefersReducedMotion) return;
         let mouseX = 0, mouseY = 0, glowX = 0, glowY = 0;
         let rafId = null;
 
-        function animate() {
+        function animarBrilhoDoCursor() {
             glowX += (mouseX - glowX) * 0.12;
             glowY += (mouseY - glowY) * 0.12;
             cursorGlowEl.style.transform = `translate3d(${glowX}px, ${glowY}px, 0)`;
-            rafId = requestAnimationFrame(animate);
+            rafId = requestAnimationFrame(animarBrilhoDoCursor);
         }
 
-        function start() {
+        function iniciarAnimacaoDoCursor() {
             if (rafId) return;
-            rafId = requestAnimationFrame(animate);
+            rafId = requestAnimationFrame(animarBrilhoDoCursor);
         }
 
-        function stop() {
+        function pararAnimacaoDoCursor() {
             if (rafId) cancelAnimationFrame(rafId);
             rafId = null;
         }
 
-        document.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; start(); }, { passive: true });
+        document.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; iniciarAnimacaoDoCursor(); }, { passive: true });
         document.addEventListener('mouseenter', () => cursorGlowEl.classList.add('visible'));
-        document.addEventListener('mouseleave', () => { cursorGlowEl.classList.remove('visible'); stop(); });
+        document.addEventListener('mouseleave', () => { cursorGlowEl.classList.remove('visible'); pararAnimacaoDoCursor(); });
 
         const interactiveElements = document.querySelectorAll('a, button, .project-card, .profile-card');
         interactiveElements.forEach((el) => {
@@ -244,13 +274,13 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    /* ---------------- Scroll reveal (IntersectionObserver) --- */
-    function initScrollReveal() {
+    /* ---------------- Revelacao ao rolar (IntersectionObserver) --- */
+    function inicializarRevelacaoAoRolar() {
         const animatedElements = document.querySelectorAll(
-            ".section-header, .about-content, .profile-card, .timeline-item, .featured-project, .project-card, .academic-project-card, .impact-card, .skills-column, .technology-cloud, .knowledge-content, .objective-content, .certification-card, .contact-content"
+            ".section-header, .about-content, .profile-card, .timeline-item, .project-card, .academic-project-card, .impact-card, .skills-column, .technology-cloud, .knowledge-content, .certification-card, .contact-content"
         );
 
-        // Use the data-reveal attribute and .revealed class expected by CSS
+        // Usa o atributo data-reveal e a classe .revealed definidos no CSS
         animatedElements.forEach((el) => el.setAttribute('data-reveal', ''));
 
         if ("IntersectionObserver" in window && !prefersReducedMotion) {
@@ -268,13 +298,13 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    /* ---------------- Project modal (accessible) ------------- */
-    function initProjectModal() {
+    /* ---------------- Modal de projetos (acessivel) ------------- */
+    function inicializarModalDeProjetos() {
         if (!projectModalEl) return;
 
         const focusableSelector = 'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])';
 
-        // build map from existing articles with ids to their data-project values
+        // Cria um mapa dos artigos existentes com seus identificadores e valores data-project
         const hashProjectMap = {};
         document.querySelectorAll('.projects-grid article[id]').forEach((el) => {
             const id = el.getAttribute('id');
@@ -282,14 +312,14 @@ document.addEventListener("DOMContentLoaded", () => {
             if (id && projectKey) hashProjectMap[id] = projectKey;
         });
 
-        // helper: open from hash
-        function openModalFromHash() {
+        // Abre o modal a partir do fragmento da URL
+        function abrirModalPeloHash() {
             const projectId = hashProjectMap[window.location.hash.slice(1)];
-            if (projectId) openModal(projectId);
+            if (projectId) abrirModalDoProjeto(projectId);
         }
 
-        // focus trap function reuses global focusableSelector
-        function trapFocusIn(container) {
+        // Mantem o foco no modal usando o seletor de elementos focaveis
+        function manterFocoNoModal(container) {
             const focusable = Array.from(container.querySelectorAll(focusableSelector)).filter(el => {
                 try { return !(el.offsetWidth === 0 && el.offsetHeight === 0) || el.getAttribute('tabindex') === '0'; }
                 catch (e) { return true; }
@@ -298,36 +328,120 @@ document.addEventListener("DOMContentLoaded", () => {
             const first = focusable[0];
             const last = focusable[focusable.length - 1];
 
-            function handleKey(e) {
-                if (e.key === 'Escape') { e.preventDefault(); closeModal(); return; }
+            function tratarTeclaNoModal(e) {
+                if (e.key === 'Escape') { e.preventDefault(); fecharModalDoProjeto(); return; }
                 if (e.key !== 'Tab') return;
                 if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
                 else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
             }
 
-            function handleFocusIn(e) {
+            function manterFocoDentroDoModal(e) {
                 if (!container.contains(e.target)) {
                     e.stopPropagation();
                     try { first.focus({ preventScroll: true }); } catch (err) { first.focus(); }
                 }
             }
 
-            document.addEventListener('keydown', handleKey);
-            document.addEventListener('focusin', handleFocusIn);
+            document.addEventListener('keydown', tratarTeclaNoModal);
+            document.addEventListener('focusin', manterFocoDentroDoModal);
 
-            return () => { document.removeEventListener('keydown', handleKey); document.removeEventListener('focusin', handleFocusIn); };
+            return () => { document.removeEventListener('keydown', tratarTeclaNoModal); document.removeEventListener('focusin', manterFocoDentroDoModal); };
         }
 
-        // openModal uses __modalState for all state
-        function openModal(projectId) {
+        function renderizarVisualAcademico(project) {
+            if (!modalVisualEl) return;
+            modalVisualEl.replaceChildren();
+            modalVisualEl.hidden = !project.visual;
+            if (!project.visual) return;
+
+            const visual = project.visual;
+            const figure = document.createElement("figure");
+            figure.className = "academic-visual-screen";
+            figure.dataset.visualType = visual.type;
+            figure.setAttribute("aria-label", `Painel conceitual do projeto ${project.title}`);
+
+            const header = document.createElement("div");
+            header.className = "academic-visual-header";
+            const monogram = document.createElement("span");
+            monogram.className = "academic-visual-monogram";
+            monogram.textContent = visual.monogram;
+            const heading = document.createElement("div");
+            heading.className = "academic-visual-heading";
+            const eyebrow = document.createElement("span");
+            eyebrow.textContent = visual.eyebrow;
+            const title = document.createElement("h3");
+            title.textContent = visual.title;
+            heading.append(eyebrow, title);
+            header.append(monogram, heading);
+            figure.appendChild(header);
+
+            const navigation = document.createElement("div");
+            navigation.className = "academic-visual-navigation";
+            visual.navigation.forEach((item) => {
+                const label = document.createElement("span");
+                label.textContent = item;
+                navigation.appendChild(label);
+            });
+            figure.appendChild(navigation);
+
+            const cards = document.createElement("div");
+            cards.className = "academic-visual-cards";
+            visual.cards.forEach((item) => {
+                const card = document.createElement("div");
+                card.className = "academic-visual-card";
+                const label = document.createElement("span");
+                label.textContent = item.label;
+                const value = document.createElement("strong");
+                value.textContent = item.value;
+                card.append(label, value);
+                cards.appendChild(card);
+            });
+            figure.appendChild(cards);
+
+            const flow = document.createElement("div");
+            flow.className = "academic-visual-flow";
+            visual.flow.forEach((item, index) => {
+                const step = document.createElement("span");
+                step.textContent = item;
+                flow.appendChild(step);
+                if (index < visual.flow.length - 1) {
+                    const arrow = document.createElement("i");
+                    arrow.setAttribute("aria-hidden", "true");
+                    flow.appendChild(arrow);
+                }
+            });
+            figure.appendChild(flow);
+
+            if (visual.bars?.length) {
+                const chart = document.createElement("div");
+                chart.className = "academic-visual-chart";
+                chart.setAttribute("aria-hidden", "true");
+                visual.bars.forEach((height) => {
+                    const bar = document.createElement("i");
+                    bar.style.setProperty("--bar-height", `${height}%`);
+                    chart.appendChild(bar);
+                });
+                figure.appendChild(chart);
+            }
+
+            const caption = document.createElement("figcaption");
+            caption.textContent = visual.caption;
+            figure.appendChild(caption);
+            modalVisualEl.appendChild(figure);
+        }
+
+        // Usa __modalState como fonte do estado do modal
+        function abrirModalDoProjeto(projectId) {
             if (__modalState.isOpen || __modalState.isClosing) return;
-            const project = findProjectById(projectId);
+            const project = encontrarProjetoPorId(projectId);
             if (!project) { console.warn(`Projeto \"${projectId}\" não encontrado.`); return; }
 
-            // fill modal
+            // Preenche o conteudo do modal
             if (modalCategoryEl) modalCategoryEl.textContent = project.category;
             if (modalTitleEl) modalTitleEl.textContent = project.title;
             if (modalDescriptionEl) modalDescriptionEl.textContent = project.description;
+            projectModalEl.classList.toggle("is-academic", project.type === "academic");
+            renderizarVisualAcademico(project.type === "academic" ? project : {});
             if (modalChallengeEl) modalChallengeEl.textContent = project.challenge;
             if (modalRoleEl) {
                 modalRoleEl.innerHTML = '';
@@ -340,73 +454,73 @@ document.addEventListener("DOMContentLoaded", () => {
             if (modalResultEl) modalResultEl.textContent = project.result;
 
             __modalState.lastFocused = document.activeElement;
-            console.debug('[modal] openModal:', projectId, 'savedScrollY=', __modalState.savedScrollY, 'lastFocused=', __modalState.lastFocused && (__modalState.lastFocused.id || __modalState.lastFocused.className || __modalState.lastFocused.tagName));
+            console.debug('[modal] abrirModalDoProjeto:', projectId, 'savedScrollY=', __modalState.savedScrollY, 'lastFocused=', __modalState.lastFocused && (__modalState.lastFocused.id || __modalState.lastFocused.className || __modalState.lastFocused.tagName));
             console.debug('[modal] activeElement after open:', document.activeElement && (document.activeElement.id || document.activeElement.className || document.activeElement.tagName));
 
-            // lock scroll
+            // Bloqueia a rolagem da pagina
             __modalState.savedScrollY = window.scrollY || window.pageYOffset || 0;
             document.documentElement.style.setProperty('--scroll-y', `${__modalState.savedScrollY}px`);
             document.body.style.position = 'fixed';
             document.body.style.top = `-${__modalState.savedScrollY}px`;
             document.body.classList.add('modal-open');
 
-            // show modal
+            // Exibe o modal
             projectModalEl.classList.add('active');
             projectModalEl.setAttribute('aria-hidden', 'false');
             __modalState.isOpen = true;
 
-            // focus modal close
+            // Move o foco para o botao de fechar o modal
             try { if (modalCloseEl && typeof modalCloseEl.focus === 'function') modalCloseEl.focus({ preventScroll: true }); }
             catch (e) { if (modalCloseEl && typeof modalCloseEl.focus === 'function') modalCloseEl.focus(); }
 
-            // after focus inside modal, hide main content from AT
+            // Depois de focar o modal, oculta o conteudo principal das tecnologias assistivas
             const main = document.querySelector('main');
             if (main) { try { main.inert = true; } catch (e) {} main.setAttribute('aria-hidden', 'true'); }
 
-            __modalState.removeFocusTrap = trapFocusIn(projectModalEl);
+            __modalState.removeFocusTrap = manterFocoNoModal(projectModalEl);
 
-            // attach close handlers idempotently
+            // Registra os manipuladores de fechamento sem duplicacao
             if (!__modalState.closeClickHandler && modalCloseEl) {
-                __modalState.closeClickHandler = (e) => { e.preventDefault(); closeModal(); };
+                __modalState.closeClickHandler = (e) => { e.preventDefault(); fecharModalDoProjeto(); };
                 modalCloseEl.addEventListener('click', __modalState.closeClickHandler);
-                // ensure pointerdown blurs any active element before click — prevents aria-hidden being set while focus remains inside modal
+                // Remove o foco ativo antes do clique para evitar ocultar um modal que ainda o contenha
                 if (!__modalState.closePointerHandler) {
                     __modalState.closePointerHandler = () => {
-                        try { document.activeElement && document.activeElement.blur && document.activeElement.blur(); } catch (err) { /* ignore */ }
+                        try { document.activeElement && document.activeElement.blur && document.activeElement.blur(); } catch (err) { /* ignorar */ }
                         console.debug('[modal] pointerdown: blurred activeElement before click');
                     };
                     modalCloseEl.addEventListener('pointerdown', __modalState.closePointerHandler);
                 }
             }
             if (!__modalState.overlayClickHandler && modalOverlayEl) {
-                __modalState.overlayClickHandler = (e) => { if (e.target === modalOverlayEl) closeModal(); };
+                __modalState.overlayClickHandler = (e) => { if (e.target === modalOverlayEl) fecharModalDoProjeto(); };
                 modalOverlayEl.addEventListener('click', __modalState.overlayClickHandler);
             }
         }
 
-        function closeModal() {
+        function fecharModalDoProjeto() {
             if (!__modalState.isOpen || __modalState.isClosing) return;
             __modalState.isClosing = true;
 
-            // remove focus trap immediately so Tab/Escape handling stops
+            // Remove imediatamente a restricao de foco para liberar Tab e Escape
             if (typeof __modalState.removeFocusTrap === 'function') { __modalState.removeFocusTrap(); __modalState.removeFocusTrap = null; }
 
-            // Restore main accessibility BEFORE moving focus back to opener
+            // Restaura a acessibilidade do conteudo principal antes de devolver o foco
             const main = document.querySelector('main');
             if (main) {
-                try { main.inert = false; } catch (e) { /* inert may be unsupported */ }
+                try { main.inert = false; } catch (e) { /* inert pode nao ser suportado */ }
                 main.setAttribute('aria-hidden', 'false');
             }
 
             // Restaurar o conteúdo principal antes de transferir o foco
             const opener = __modalState.lastFocused;
 
-            // Try to move focus back to the opener if possible
+            // Tenta devolver o foco ao elemento que abriu o modal
             if (opener && opener.isConnected && typeof opener.focus === 'function') {
-                try { opener.focus({ preventScroll: true }); } catch (e) { try { opener.focus(); } catch (e2) { /* ignore */ } }
+                try { opener.focus({ preventScroll: true }); } catch (e) { try { opener.focus(); } catch (e2) { /* ignorar */ } }
             } else {
-                // If opener is not available, create a temporary off-screen focusable element
-                // and focus it to ensure focus leaves the modal before setting aria-hidden.
+                // Se o elemento de origem nao estiver disponivel, cria um elemento temporario fora da tela
+                // e move o foco para ele antes de aplicar aria-hidden ao modal
                 let tmp = null;
                 try {
                     tmp = document.createElement('div');
@@ -417,11 +531,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     tmp.style.width = '1px';
                     tmp.style.height = '1px';
                     document.body.appendChild(tmp);
-                    try { tmp.focus({ preventScroll: true }); } catch (e) { try { tmp.focus(); } catch (e2) { /* ignore */ } }
+                    try { tmp.focus({ preventScroll: true }); } catch (e) { try { tmp.focus(); } catch (e2) { /* ignorar */ } }
                 } catch (e) {
-                    /* ignore temporary focus element failures */
+                    /* Ignora falhas ao criar o elemento temporario de foco */
                 } finally {
-                    try { if (tmp && tmp.parentNode) tmp.parentNode.removeChild(tmp); } catch (e) { /* ignore */ }
+                    try { if (tmp && tmp.parentNode) tmp.parentNode.removeChild(tmp); } catch (e) { /* ignorar */ }
                 }
             }
 
@@ -429,7 +543,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!projectModalEl.contains(document.activeElement)) {
                 projectModalEl.setAttribute('aria-hidden', 'true');
             } else {
-                try { document.activeElement && document.activeElement.blur && document.activeElement.blur(); } catch (e) { /* ignore */ }
+                try { document.activeElement && document.activeElement.blur && document.activeElement.blur(); } catch (e) { /* ignorar */ }
 
                 if (!projectModalEl.contains(document.activeElement)) {
                     projectModalEl.setAttribute('aria-hidden', 'true');
@@ -440,71 +554,71 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             }
 
-            // compute transition/animation duration and use a safe fallback
+            // Calcula a duracao da transicao ou animacao e define um limite de seguranca
             const computed = window.getComputedStyle(projectModalEl);
             const duration = Math.max(parseFloat(computed.transitionDuration || '0') || 0, parseFloat(computed.animationDuration || '0') || 0) * 1000;
             const fallback = Math.max(200, Math.ceil(duration + 80));
 
             let finished = false;
-            function finalize() {
+            function finalizarFechamentoDoModal() {
                 if (finished) return; finished = true;
 
-                // hide visual state
+                // Oculta o modal
                 projectModalEl.classList.remove('active');
-                // restore body positioning so the document is scrollable again
+                // Restaura o posicionamento do corpo para permitir rolagem novamente
                 document.body.style.position = '';
                 document.body.style.top = '';
                 document.body.classList.remove('modal-open');
 
-                // then restore scroll position without smooth behavior
+                // Restaura a posicao da rolagem sem animacao
                 const y = __modalState.savedScrollY || 0;
-                try { document.documentElement.classList.add('disable-smooth-scroll'); } catch (e) { /* ignore */ }
+                try { document.documentElement.classList.add('disable-smooth-scroll'); } catch (e) { /* ignorar */ }
                 try {
                     window.scrollTo(0, y);
                 } catch (e) {
-                    /* ignore */
+                    /* ignorar */
                 }
-                // remove the class shortly after to re-enable smooth scrolling
-                setTimeout(() => { try { document.documentElement.classList.remove('disable-smooth-scroll'); } catch (e) { /* ignore */ } }, 60);
+                // Remove a classe em seguida para reativar a rolagem suave
+                setTimeout(() => { try { document.documentElement.classList.remove('disable-smooth-scroll'); } catch (e) { /* ignorar */ } }, 60);
 
-                // ensure opener has focus (best effort) after restoring scroll
+                // Tenta focar novamente o elemento de origem depois de restaurar a rolagem
                 if (__modalState.lastFocused && typeof __modalState.lastFocused.focus === 'function') {
-                    try { __modalState.lastFocused.focus({ preventScroll: true }); } catch (err) { try { __modalState.lastFocused.focus(); } catch (err2) { /* ignore */ } }
+                    try { __modalState.lastFocused.focus({ preventScroll: true }); } catch (err) { try { __modalState.lastFocused.focus(); } catch (err2) { /* ignorar */ } }
                 }
 
-                // cleanup handlers
+                // Remove os manipuladores de eventos
                 if (__modalState.closeClickHandler && modalCloseEl) { modalCloseEl.removeEventListener('click', __modalState.closeClickHandler); __modalState.closeClickHandler = null; }
                 if (__modalState.overlayClickHandler && modalOverlayEl) { modalOverlayEl.removeEventListener('click', __modalState.overlayClickHandler); __modalState.overlayClickHandler = null; }
                 if (__modalState.closePointerHandler && modalCloseEl) { modalCloseEl.removeEventListener('pointerdown', __modalState.closePointerHandler); __modalState.closePointerHandler = null; }
 
-                // clear hash if present (defensive)
-                try { clearProjectHash(); } catch (e) { /* ignore */ }
+                // Limpa o fragmento da URL, se houver
+                try { limparHashDoProjeto(); } catch (e) { /* ignorar */ }
 
                 __modalState.isOpen = false; __modalState.isClosing = false;
             }
 
             let settled = false;
-            const onEnd = (e) => { if (e && e.target !== projectModalEl) return; if (settled) return; settled = true; projectModalEl.removeEventListener('transitionend', onEnd); finalize(); };
-            projectModalEl.addEventListener('transitionend', onEnd);
-            setTimeout(() => { if (!settled) onEnd(); }, fallback);
+            const aoFinalizarTransicao = (e) => { if (e && e.target !== projectModalEl) return; if (settled) return; settled = true; projectModalEl.removeEventListener('transitionend', aoFinalizarTransicao); finalizarFechamentoDoModal(); };
+            projectModalEl.addEventListener('transitionend', aoFinalizarTransicao);
+            setTimeout(() => { if (!settled) aoFinalizarTransicao(); }, fallback);
         }
 
-        // bind openers (cards and buttons)
+        // Associa a abertura do modal aos cartoes e botoes
         projectCards.forEach((card) => {
             const projectId = card.dataset.project;
             if (!projectId) return;
-            card.addEventListener('click', (ev) => { if (ev.target.closest('.project-button')) return; openModal(projectId); });
+            card.addEventListener('click', (ev) => { if (ev.target.closest('.project-button')) return; abrirModalDoProjeto(projectId); });
             const btn = card.querySelector('.project-button');
-            if (btn) btn.addEventListener('click', (ev) => { ev.preventDefault(); ev.stopPropagation(); openModal(projectId); });
+            if (btn) btn.addEventListener('click', (ev) => { ev.preventDefault(); ev.stopPropagation(); abrirModalDoProjeto(projectId); });
         });
 
-        // open from hash if present
-        window.addEventListener('hashchange', openModalFromHash);
-        openModalFromHash();
+        // Abre o modal pelo fragmento da URL, se houver
+        window.addEventListener('hashchange', abrirModalPeloHash);
+        abrirModalPeloHash();
     }
 
-    /* ---------------- Project cards interaction ------------- */
-    function initProjectCards() {
+    /* ---------------- Interacao com cartoes de projetos ------------- */
+    function inicializarCartoesDeProjetos() {
         if (prefersReducedMotion) return;
         projectCards.forEach((card) => {
             card.addEventListener('mousemove', (event) => {
@@ -518,8 +632,8 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    /* ---------------- Hero parallax & title effects --------- */
-    function initHeroEffects() {
+    /* ---------------- Efeitos de paralaxe e titulo do destaque --------- */
+    function inicializarEfeitosDoDestaque() {
         const hero = document.querySelector('.hero');
         const heroVisual = document.querySelector('.hero-visual');
         if (!hero || !heroVisual || prefersReducedMotion) return;
@@ -534,8 +648,8 @@ document.addEventListener("DOMContentLoaded", () => {
         if (heroTitle && !prefersReducedMotion) heroTitle.classList.add('hero-title-ready');
     }
 
-    /* ---------------- Technologies hover ------------------- */
-    function initTechHover() {
+    /* ---------------- Interacao ao passar sobre tecnologias ------------------- */
+    function inicializarInteracoesDeTecnologias() {
         const items = document.querySelectorAll('.technology-cloud span');
         items.forEach((item) => {
             item.addEventListener('mouseenter', () => item.classList.add('technology-active'));
@@ -543,23 +657,23 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    /* ---------------- Resume actions ----------------------- */
-    function initResumeMenu() {
+    /* ---------------- Acoes do curriculo ----------------------- */
+    function inicializarMenuDoCurriculo() {
         if (!resumeTriggerEl || !resumeMenuEl) return;
 
-        function closeMenu() {
+        function fecharMenuDoCurriculo() {
             resumeMenuEl.hidden = true;
             resumeTriggerEl.setAttribute("aria-expanded", "false");
         }
 
-        function toggleMenu() {
+        function alternarMenuDoCurriculo() {
             const isOpen = resumeMenuEl.hidden;
             resumeMenuEl.hidden = !isOpen;
             resumeTriggerEl.setAttribute("aria-expanded", String(isOpen));
         }
 
-        resumeTriggerEl.addEventListener("click", toggleMenu);
-        resumeMenuEl.querySelectorAll("a").forEach((link) => link.addEventListener("click", closeMenu));
+        resumeTriggerEl.addEventListener("click", alternarMenuDoCurriculo);
+        resumeMenuEl.querySelectorAll("a").forEach((link) => link.addEventListener("click", fecharMenuDoCurriculo));
         const downloadLink = resumeMenuEl.querySelector(".resume-download");
         if (downloadLink) {
             downloadLink.addEventListener("click", async (event) => {
@@ -568,7 +682,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 try {
                     const response = await fetch(downloadLink.href);
-                    if (!response.ok) throw new Error(`Download failed: ${response.status}`);
+                    if (!response.ok) throw new Error(`Falha ao baixar o curriculo: ${response.status}`);
 
                     const pdfBlob = await response.blob();
                     const blobUrl = URL.createObjectURL(pdfBlob);
@@ -580,7 +694,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     temporaryLink.remove();
                     URL.revokeObjectURL(blobUrl);
                 } catch (error) {
-                    // Fallback for local previews or browsers that block Blob downloads.
+                    // Alternativa para visualizacoes locais ou navegadores que bloqueiam downloads Blob.
                     window.location.href = downloadLink.href;
                 } finally {
                     downloadLink.removeAttribute("aria-busy");
@@ -588,20 +702,20 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
         document.addEventListener("click", (event) => {
-            if (!event.target.closest(".resume-action")) closeMenu();
+            if (!event.target.closest(".resume-action")) fecharMenuDoCurriculo();
         });
         document.addEventListener("keydown", (event) => {
-            if (event.key === "Escape") closeMenu();
+            if (event.key === "Escape") fecharMenuDoCurriculo();
         });
     }
 
-    /* ---------------- Reading progress and top button ----- */
-    function initScrollUtilities() {
+    /* ---------------- Progresso de leitura e botao de topo ----- */
+    function inicializarUtilitariosDeRolagem() {
         if (!readingProgressBarEl && !backToTopEl) return;
 
         let ticking = false;
 
-        function updateScrollUtilities() {
+        function atualizarUtilitariosDeRolagem() {
             const documentHeight = document.documentElement.scrollHeight - window.innerHeight;
             const progress = documentHeight > 0 ? Math.min(100, (window.scrollY / documentHeight) * 100) : 0;
             if (readingProgressBarEl) readingProgressBarEl.style.width = `${progress}%`;
@@ -609,15 +723,15 @@ document.addEventListener("DOMContentLoaded", () => {
             ticking = false;
         }
 
-        function requestScrollUpdate() {
+        function solicitarAtualizacaoDaRolagem() {
             if (ticking) return;
             ticking = true;
-            window.requestAnimationFrame(updateScrollUtilities);
+            window.requestAnimationFrame(atualizarUtilitariosDeRolagem);
         }
 
-        updateScrollUtilities();
-        window.addEventListener("scroll", requestScrollUpdate, { passive: true });
-        window.addEventListener("resize", requestScrollUpdate, { passive: true });
+        atualizarUtilitariosDeRolagem();
+        window.addEventListener("scroll", solicitarAtualizacaoDaRolagem, { passive: true });
+        window.addEventListener("resize", solicitarAtualizacaoDaRolagem, { passive: true });
 
         if (backToTopEl) {
             backToTopEl.addEventListener("click", () => {
@@ -626,19 +740,20 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    /* ---------------- Initialization ----------------------- */
-    initNavigation();
-    initMobileMenu();
-    initCursorGlow();
-    initScrollReveal();
-    // load projects (will call initProjectModal after data is ready)
-    loadProjects();
-    initProjectCards();
-    initHeroEffects();
-    initTechHover();
-    initScrollUtilities();
-    initResumeMenu();
+    /* ---------------- Inicializacao ----------------------- */
+    atualizarTempoDeTrabalho();
+    inicializarNavegacao();
+    inicializarMenuMovel();
+    inicializarBrilhoDoCursor();
+    inicializarRevelacaoAoRolar();
+    // Carrega os projetos e inicializa o modal quando os dados estiverem prontos
+    carregarProjetos();
+    inicializarCartoesDeProjetos();
+    inicializarEfeitosDoDestaque();
+    inicializarInteracoesDeTecnologias();
+    inicializarUtilitariosDeRolagem();
+    inicializarMenuDoCurriculo();
 
-    // refresh projectCards nodeList in case DOM changed
-    projectCards = document.querySelectorAll('.projects-section .project-card');
+    // Atualiza a lista de cartoes caso o DOM tenha mudado
+    projectCards = document.querySelectorAll('.projects-section .project-card, .academic-section .project-card');
 });

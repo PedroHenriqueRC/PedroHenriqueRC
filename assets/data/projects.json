@@ -49,5 +49,100 @@
     ],
     "technologies": ["Azure DevOps", "Git", "YAML", "CI/CD", "Linux", "Shell Script"],
     "result": "Maior padronização e automação dos processos de desenvolvimento e entrega."
+  },
+  {
+    "id": "project-allocation-manager",
+    "type": "academic",
+    "category": "GESTÃO & AUTOMAÇÃO",
+    "title": "Project Allocation Manager",
+    "description": "Solução acadêmica para apoiar a gestão de projetos, recursos, fases, entregas e apontamento de horas, reunindo informações operacionais em um único fluxo.",
+    "challenge": "Substituir controles manuais e dispersos por uma forma centralizada de acompanhar projetos, alocações e horas, com dados acessíveis para análise.",
+    "role": [
+      "Desenvolvimento de uma solução para gerenciamento de projetos, recursos, fases, entregas e lançamento de horas",
+      "Modelagem do banco de dados",
+      "Implementação de processos de integração e armazenamento de dados",
+      "Automação de fluxos e armazenamento em nuvem",
+      "Apoio à criação de dashboards para acompanhamento das informações"
+    ],
+    "technologies": ["React", "JavaScript", "Node.js", "MySQL", "SQL", "n8n", "AWS S3", "Amazon EC2", "Grafana"],
+    "result": "Centralização das informações de projetos e alocação, com automação de fluxos e dashboards para apoiar o acompanhamento operacional.",
+    "visual": {
+      "type": "allocation",
+      "monogram": "PA",
+      "eyebrow": "GESTÃO DE RECURSOS",
+      "title": "Visão de alocação",
+      "navigation": ["Projetos", "Equipe", "Horas"],
+      "cards": [
+        { "label": "Planejamento", "value": "Projetos" },
+        { "label": "Capacidade", "value": "Recursos" },
+        { "label": "Acompanhamento", "value": "Horas" }
+      ],
+      "flow": ["Projeto", "Alocação", "Apontamento"],
+      "caption": "Representação conceitual do fluxo de gestão do projeto."
+    }
+  },
+  {
+    "id": "preciosos-lacos",
+    "type": "academic",
+    "category": "FULL STACK & ANALYTICS",
+    "title": "Preciosos Laços",
+    "description": "Projeto desenvolvido para uma cliente real: uma solução Full Stack para digitalizar a operação de uma microempreendedora, organizar produtos e apoiar decisões com dados.",
+    "challenge": "Compreender as necessidades da cliente e transformar a rotina de uma loja de produtos artesanais em uma solução digital para gestão de produtos, valores e vendas sob demanda.",
+    "role": [
+      "Participação no processo de discovery e levantamento de requisitos com a cliente",
+      "Definição de escopo e arquitetura da solução",
+      "Desenvolvimento Front-End e Back-End",
+      "Modelagem e implementação do banco de dados",
+      "Documentação técnica e apresentações e validações com stakeholders",
+      "Desenvolvimento de dashboard analítico para acompanhamento do negócio"
+    ],
+    "technologies": ["React", "JavaScript", "Kotlin", "Spring Boot", "Node.js", "MySQL", "JWT"],
+    "result": "Entrega de um e-commerce de produtos artesanais com recursos de gestão e dashboard analítico para apoiar a administração da loja.",
+    "visual": {
+      "type": "store",
+      "monogram": "PL",
+      "eyebrow": "PROJETO PARA CLIENTE REAL",
+      "title": "Painel da loja",
+      "navigation": ["Visão geral", "Produtos", "Pedidos"],
+      "cards": [
+        { "label": "Catálogo", "value": "Produtos" },
+        { "label": "Operação", "value": "Vendas" },
+        { "label": "Decisão", "value": "Dashboard" }
+      ],
+      "flow": ["Produtos", "Venda sob demanda", "Análise"],
+      "bars": [32, 54, 43, 76, 62, 88],
+      "caption": "Painel ilustrativo inspirado na solução de gestão e análise da loja."
+    }
+  },
+  {
+    "id": "freezeway",
+    "type": "academic",
+    "category": "IOT & MONITORAMENTO",
+    "title": "FreezeWay",
+    "description": "Solução acadêmica de monitoramento de temperatura com Arduino, integração a banco de dados e serviços executados em uma máquina virtual Linux Ubuntu.",
+    "challenge": "Monitorar continuamente a temperatura de cargas refrigeradas e organizar a coleta e o armazenamento dos dados para facilitar a identificação de variações.",
+    "role": [
+      "Participação na integração entre hardware e software",
+      "Coleta e processamento das informações monitoradas",
+      "Integração com banco de dados MySQL para armazenamento dos dados",
+      "Execução de serviços em máquina virtual Linux Ubuntu"
+    ],
+    "technologies": ["Arduino Uno", "Sensor LM35", "MySQL", "Linux Ubuntu", "Máquina Virtual", "HTML5", "CSS", "JavaScript", "Node.js"],
+    "result": "Monitoramento contínuo da temperatura com dados coletados e armazenados para apoiar a identificação de desvios.",
+    "visual": {
+      "type": "monitoring",
+      "monogram": "FW",
+      "eyebrow": "MONITORAMENTO IOT",
+      "title": "Telemetria de temperatura",
+      "navigation": ["Sensor", "Leituras", "Histórico"],
+      "cards": [
+        { "label": "Captura", "value": "LM35" },
+        { "label": "Integração", "value": "Arduino" },
+        { "label": "Persistência", "value": "MySQL" }
+      ],
+      "flow": ["Sensor", "Coleta", "Armazenamento"],
+      "bars": [48, 65, 53, 78, 60, 84],
+      "caption": "Visualização conceitual da coleta e do histórico de temperatura."
+    }
   }
 ]
